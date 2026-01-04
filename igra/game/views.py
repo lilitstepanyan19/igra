@@ -3,45 +3,43 @@ import random
 
 LETTERS = list("ABCDEFGHIJKLMNOPQRSTUVWXYZ")
 LETTERS_TO_EAT = 5
+MAX_WORLDS = 3
 
 
 def get_game_state(request):
     if "count" not in request.session:
         request.session["count"] = 0
+    if "world" not in request.session:
+        request.session["world"] = 1
     return request.session
 
 
-# Главная страница - первый мир
 def game_page(request):
     state = get_game_state(request)
+
+    # Проверяем, не вышли ли за пределы миров
+    if state["world"] > MAX_WORLDS:
+        return redirect("game:finish_page")  # можно создать финальную страницу
+
+    world_number = state["world"]
+    template_name = f"game/world_{world_number}.html"
 
     if request.method == "POST":
         state["count"] += 1
         if state["count"] >= LETTERS_TO_EAT:
             state["count"] = 0
-            return redirect("game:world_page")  # переход на другой мир
+            state["world"] += 1
+            return redirect("game:game_page")  # переход на следующий мир
 
     letter = random.choice(LETTERS)
-    return render(
-        request, "game/start.html", {"letter": letter, "count": state["count"]}
-    )
+    return render(request, template_name, {"letter": letter, "count": state["count"]})
 
 
-# Страница второго мира
-def world_page(request):
-    state = get_game_state(request)
-
-    if request.method == "POST":
-        state["count"] += 1
-        letter = random.choice(LETTERS)
-        return render(
-            request, "game/world.html", {"letter": letter, "count": state["count"]}
-        )
-
-    return render(request, "game/world.html", {"letter": None, "count": state["count"]})
-
-
-# Сброс игры
 def reset_game(request):
     request.session["count"] = 0
+    request.session["world"] = 1
     return redirect("game:game_page")
+
+
+def finish_page(request):
+    return render(request, "game/finish_page.html")

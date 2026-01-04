@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+  Игра завершена!
+{% endblock %}
+
+{% block new-game %}{% endblock new-game %}
+
+{% block world-title %}
+  🚀 Игра завершена!
+{% endblock %}
+{% block worlds %}
+    <h2>Поздравляем! Вы завершили игру!</h2>
+    <p>Вы собрали все буквы! Хотите начать заново? 
+      <a href="{% url 'game:reset_game' %}">Начать заново</a>
+    </p>
+{% endblock worlds %}

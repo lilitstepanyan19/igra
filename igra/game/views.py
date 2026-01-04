@@ -1,28 +1,47 @@
-from django.shortcuts import render
-from django.http import JsonResponse
-from django.views.decorators.http import require_POST
-from .models import GameState
+from django.shortcuts import render, redirect
+import random
+
+LETTERS = list("ABCDEFGHIJKLMNOPQRSTUVWXYZ")
+LETTERS_TO_EAT = 5
 
 
+def get_game_state(request):
+    if "count" not in request.session:
+        request.session["count"] = 0
+    return request.session
+
+
+# Главная страница - первый мир
 def game_page(request):
-    state, _ = GameState.objects.get_or_create(id=1)
-    return render(request, "game/start.html", {"state": state})
+    state = get_game_state(request)
 
-def eat_letter(request):
-    state, _ = GameState.objects.get_or_create(id=1)
+    if request.method == "POST":
+        state["count"] += 1
+        if state["count"] >= LETTERS_TO_EAT:
+            state["count"] = 0
+            return redirect("game:world_page")  # переход на другой мир
 
-    # Увеличиваем буквы, только если меньше 5
-    if state.letters_eaten < 5:
-        state.letters_eaten += 1
-        state.save()
-
-    # Всегда возвращаем JSON
-    return JsonResponse({"letters": state.letters_eaten, "portal": state.portal_open()})
+    letter = random.choice(LETTERS)
+    return render(
+        request, "game/start.html", {"letter": letter, "count": state["count"]}
+    )
 
 
-@require_POST
+# Страница второго мира
+def world_page(request):
+    state = get_game_state(request)
+
+    if request.method == "POST":
+        state["count"] += 1
+        letter = random.choice(LETTERS)
+        return render(
+            request, "game/world.html", {"letter": letter, "count": state["count"]}
+        )
+
+    return render(request, "game/world.html", {"letter": None, "count": state["count"]})
+
+
+# Сброс игры
 def reset_game(request):
-    state, _ = GameState.objects.get_or_create(id=1)
-    state.letters_eaten = 0
-    state.save()
-    return JsonResponse({"ok": True})
+    request.session["count"] = 0
+    return redirect("game:game_page")

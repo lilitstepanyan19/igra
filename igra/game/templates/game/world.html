@@ -1,13 +1,23 @@
-<!-- Мир 1 → Мир 2 -->
-<div id="world" class="hidden">
-<h1>🌈 Другой мир</h1>
-</div>
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Малыш и буквы - Мир 2</title>
+    <link rel="stylesheet" href="{% static 'game/style.css' %}">
+</head>
+<body>
+    <h1>🌈 Малыш в другом мире - Мир 2</h1>
+    <p>Съедено: {{ count }} / 5</p>
 
+    <form method="post">
+        {% csrf_token %}
+        <button type="submit">{{ letter|default:"ЕСТЬ БУКВУ" }}</button>
+    </form>
 
-<div id="world2" class="hidden world world-forest">
-<h1>💎 Кристальный лес</h1>
-<p>Собери 3 кристалла, чтобы открыть следующий портал</p>
-<div id="crystals"></div>
-<p>Кристаллов собрано: <span id="crystalCount">0</span> / 3</p>
-<div id="portal2" class="hidden">🌀 ПОРТАЛ В МИР 3</div>
-</div>
+    <form action="{% url 'game:reset_game' %}" method="post">
+        {% csrf_token %}
+        <button type="submit">🔄 Новая игра</button>
+    </form>
+</body>
+</html>

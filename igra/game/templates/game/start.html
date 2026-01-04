@@ -1,30 +1,23 @@
+{% extends 'base.html' %}
 {% load static %}
 
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Малыш и волшебные буквы</title>
-    <link rel="stylesheet" href="{% static 'game/style.css' %}">
-</head>
-<body>
-<div class="game">
-    <h1>🍭 Малыш и волшебные буквы</h1>
-    <button id="resetBtn">🔄 Новая игра</button>
+{% block title %}
+  Малыш и волшебные буквы - Начало игры
+{% endblock %}
+
+{% block worlds %}
+    <h1>🍭 Малыш и буквы - Мир 1</h1>
     <div id="baby">👶</div>
-    <div id="letters"></div>
-    <p>Съедено: <span id="count">0</span> / 5</p>
-    <div id="portal" class="hidden">🌀 ПОРТАЛ ОТКРЫТ!</div>
-</div>
-<div id="world" class="hidden">
-    <h1>🌈 Другой мир</h1>
-</div>
-<div id="world2" class="hidden world world-forest">
-    <h1>💎 Кристальный лес</h1>
-    <p>Собери 3 кристалла, чтобы открыть следующий портал</p>
-    <div id="crystals"></div>
-    <p>Кристаллов собрано: <span id="crystalCount">0</span> / 3</p>
-    <div id="portal2" class="hidden">🌀 ПОРТАЛ В МИР 3</div>
-</div>
-<script src="{% static 'game/game.js' %}"></script>
-</body>
-</html>
+    <p>Съедено: {{ count }} / 5</p>
+
+    <form method="post">
+        {% csrf_token %}
+        <button type="submit">{{ letter|default:"ЕСТЬ БУКВУ" }}</button>
+    </form>
+
+
+{% endblock worlds%}
+
+{% block script %}
+    <script src="{% static 'js/game.js' %}"></script>
+{% endblock %}

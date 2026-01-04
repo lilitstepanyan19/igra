@@ -1,0 +1,42 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8" />
+        {% block css %}
+            <link rel="stylesheet" href="{% static 'css/style.css' %}" />
+            {% endblock css %}
+        <title>
+          {% block title %}
+            Малыш и волшебные буквы
+          {% endblock %}
+        </title>
+    </head>
+    <body>
+        <form action="{% url 'game:reset_game' %}" method="post">
+            {% csrf_token %}
+            <button type="submit">🔄 Новая игра</button>
+        </form>
+       
+        {% block worlds %}
+            <h1>🍭 Малыш и буквы - Мир 1</h1>
+    <div id="baby">👶</div>
+    <p>Съедено: {{ count }} / 5</p>
+
+    <form method="post">
+        {% csrf_token %}
+        <button type="submit">{{ letter|default:"ЕСТЬ БУКВУ" }}</button>
+    </form>
+
+    <form action="{% url 'game:reset_game' %}" method="post">
+        {% csrf_token %}
+        <button type="submit">🔄 Новая игра</button>
+    </form>
+        {% endblock worlds%}
+
+        {% block script %}
+            <script src="{% static 'js/game.js' %}"></script>
+        {% endblock %}
+    </body>
+</html>

@@ -1,0 +1,93 @@
+body {
+    font-family: sans-serif;
+    text-align: center;
+    background: #eef;
+}
+
+button {
+    font-size: 2em;
+    padding: 0.5em 1em;
+    margin: 10px;
+    cursor: pointer;
+}
+#baby {
+    font-size: 80px;
+    transition: transform 0.3s;
+}
+
+
+.letter {
+    display: inline-block;
+    font-size: 40px;
+    margin: 10px;
+    cursor: pointer;
+    transition: transform 0.4s, opacity 0.4s;
+}
+
+
+.letter.eaten {
+    transform: scale(0) rotate(180deg);
+    opacity: 0;
+}
+
+
+#portal,
+#portal2 {
+    font-size: 40px;
+    animation: pulse 1s infinite;
+}
+
+.hidden {
+    display: none;
+}
+
+.world {
+    min-height: 100vh;
+    padding-top: 40px;
+}
+
+
+.world-forest {
+    background: radial-gradient(circle at top, #9f9, #060);
+    color: #fff;
+    animation: fog 6s infinite alternate;
+}
+
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.2);
+    }
+
+    100% {
+        transform: scale(1);
+    }
+}
+
+
+@keyframes fog {
+    from {
+        filter: blur(0px);
+    }
+
+    to {
+        filter: blur(1.5px);
+    }
+}
+
+
+.crystal {
+    display: inline-block;
+    font-size: 48px;
+    margin: 12px;
+    cursor: pointer;
+    transition: transform 0.3s, opacity 0.3s;
+}
+
+.crystal.collected {
+    transform: scale(0);
+    opacity: 0;
+}

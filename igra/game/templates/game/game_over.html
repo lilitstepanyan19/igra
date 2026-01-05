@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+    Game Over!
+{% endblock %}
+
+{% block new-game %}{% endblock new-game %}
+
+{% block world-title %}
+  💀 Game Over!
+{% endblock %}
+{% block worlds %}
+    <h2>Вы проиграли!</h2>
+    <p>Ооопс! Хотите начать заново? 
+      <a href="{% url 'game:reset_game' %}">Начать заново</a>
+    </p>
+{% endblock worlds %}
+
+<h1></h1>
+
+<a href="{% url 'game:game_page' %}">🔄 Start again</a>

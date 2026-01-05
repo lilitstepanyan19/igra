@@ -9,6 +9,7 @@
             {% endblock css %}
         <title>
           {% block title %}
+            Мир {{ world_number }}
             Малыш и волшебные буквы
           {% endblock title%}
         </title>
@@ -18,17 +19,24 @@
             <form action="{% url 'game:reset_game' %}" method="post">
                 {% csrf_token %}
                 <button type="submit">🔄 Новая игра</button>
-            </form>{% endblock new-game %}
-    <h1>{% block world-title %}🍭 Малыш и буквы - Мир 1{% endblock world-title %}</h1> 
+            </form>
+        {% endblock new-game %}
+        <h1>{% block world-title %}🍭 Малыш и буквы - Мир {{ world_number }}{% endblock world-title %}</h1> 
+            
+        {% block worlds %}
+            <div id="baby">👶</div>
+            <p>Счёт: {{ count }} | Жизни: {{ lives }} | Время: <span id="time">5</span></p>
 
-    {% block worlds %}
-        <div id="baby">👶</div>
-        <p>Съедено: {{ count }} / 5</p>
-
-        <form method="post">
-            {% csrf_token %}
-            <button type="submit">{{ letter|default:"ЕСТЬ БУКВУ" }}</button>
-        </form>
+            <div id="game" data-miss-url="{% url 'game:miss_letter' %}" 
+                style="width:100%;height:250px;border:2px solid black;position:relative;overflow:hidden;">
+            
+                {% for l in letters %}
+                    <span class="letter"
+                        style="position:absolute;font-size:32px;cursor:pointer;">
+                        {{ l }}
+                    </span>
+                {% endfor %}
+            </div>
         {% endblock worlds%}
 
         {% block script %}

@@ -3,8 +3,21 @@ import random
 
 LETTERS = list("ABCDEFGHIJKLMNOPQRSTUVWXYZ")
 LETTERS_TO_EAT = 5
+LETTERS_VIEWED = 5
 MAX_WORLDS = 3
 START_LIVES = 3
+
+
+def start_page(request):
+    if request.method == "POST":
+        request.session.flush()  # чистим старую игру
+        request.session["world"] = 1
+        request.session["count"] = 0
+        request.session["lives"] = START_LIVES
+        return redirect("game:game_page")  # переход в world_1
+
+    return render(request, "game/start.html")
+
 
 def get_game_state(request):
     request.session.setdefault("count", 0)
@@ -38,7 +51,7 @@ def game_page(request):
         request,
         template_name,
         {
-            "letters": random.sample(LETTERS, 3),
+            "letters": random.sample(LETTERS, LETTERS_VIEWED),
             "count": state["count"],
             "world": state["world"],
             "lives": state["lives"],
@@ -62,4 +75,4 @@ def finish_page(request):
 
 def reset_game(request):
     request.session.flush()
-    return redirect("game:game_page")
+    return redirect("game:start")

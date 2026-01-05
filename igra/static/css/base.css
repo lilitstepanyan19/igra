@@ -10,11 +10,20 @@ button {
     margin: 10px;
     cursor: pointer;
 }
-#baby {
-    font-size: 80px;
-    transition: transform 0.3s;
+
+#game {
+    width: 100%;
+    height: 250px;
+    border: 2px solid black;
+    position: relative;
+    overflow: hidden;
 }
 
+.game-letter {
+    position: absolute;
+    font-size: 32px;
+    cursor: pointer;
+}
 
 .letter {
     display: inline-block;
@@ -22,6 +31,7 @@ button {
     margin: 10px;
     cursor: pointer;
     transition: transform 0.4s, opacity 0.4s;
+    position:absolute;font-size:32px;cursor:pointer;
 }
 
 

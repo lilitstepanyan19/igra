@@ -3,7 +3,6 @@ import random
 
 LETTERS = list("ABCDEFGHIJKLMNOPQRSTUVWXYZ")
 LETTERS_TO_EAT = 5
-LETTERS_VIEWED = 5
 MAX_WORLDS = 3
 START_LIVES = 3
 
@@ -32,7 +31,7 @@ def game_page(request):
     # ❌ жизни закончились
     if state["lives"] <= 0:
         return render(request, "game/game_over.html")
-    
+
     # Проверяем, не вышли ли за пределы миров
     if state["world"] > MAX_WORLDS:
         return redirect("game:finish_page")  # можно создать финальную страницу
@@ -40,8 +39,16 @@ def game_page(request):
     world_number = state["world"]
     template_name = f"game/world_{world_number}.html"
 
+    target_letter = LETTERS[world_number - 1]  # выбираем букву для текущего мира
+
+    letters = ([target_letter] * 3 + random.sample([l for l in LETTERS if l != target_letter], 2))
+
     if request.method == "POST":
-        state["count"] += 1
+        clicked = request.POST.get("letter")
+
+        if clicked == target_letter:
+            state["count"] += 1
+
         if state["count"] >= LETTERS_TO_EAT:
             state["count"] = 0
             state["world"] += 1
@@ -51,7 +58,8 @@ def game_page(request):
         request,
         template_name,
         {
-            "letters": random.sample(LETTERS, LETTERS_VIEWED),
+            "letters": letters,
+            "target_letter": target_letter,
             "count": state["count"],
             "world": state["world"],
             "lives": state["lives"],

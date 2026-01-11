@@ -16,6 +16,13 @@ NEED_TO_EAT = 5
 START_LIVES = 3
 TIME_LIMIT = 10  # seconds
 
+WORLD_WIDTH = 3000
+camera_x = 0
+
+LEFT_BORDER = 300
+RIGHT_BORDER = WIDTH - 300
+
+
 # ---------- PYGAME ----------
 pygame.init()
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
@@ -93,13 +100,16 @@ while running:
             running = False
 
     # ---- keyboard movement ----
+    moved = False
     keys = pygame.key.get_pressed()
     if keys[pygame.K_LEFT]:
         cat_x -= CAT_SPEED
         cat_frames = cat_left
+        moved = True
     if keys[pygame.K_RIGHT]:
         cat_x += CAT_SPEED
         cat_frames = cat_right
+        moved = True
     if keys[pygame.K_UP]:
         cat_y -= CAT_SPEED
     if keys[pygame.K_DOWN]:
@@ -114,6 +124,7 @@ while running:
         cat_x += dx * MOUSE_SPEED
         cat_y += dy * MOUSE_SPEED
         cat_frames = cat_right if dx > 0 else cat_left
+        moved = True
 
     # ---- enforce cat bounds ----
     cat_rect = cat_frames[int(cat_index)].get_rect(center=(cat_x, cat_y))
@@ -128,9 +139,13 @@ while running:
     cat_rect.center = (cat_x, cat_y)
 
     # ---- animate cat ----
-    cat_index += 0.25
-    if cat_index >= len(cat_frames):
+    if moved:
+        cat_index += 0.15
+        if cat_index >= len(cat_frames):
+            cat_index = 0
+    else:
         cat_index = 0
+        cat_img = cat_frames[0]
     cat_img = cat_frames[int(cat_index)]
 
     # ---- timer ----
@@ -158,7 +173,7 @@ while running:
         if cat_rect.colliderect(rect):
             if l[0] == TARGETS[world]:
                 score += 1
-            letters.remove(l)  # убираем букву только если правильная
+                letters.remove(l)  # убираем букву только если правильная
 
     # ---- next world ----
     if score >= NEED_TO_EAT:

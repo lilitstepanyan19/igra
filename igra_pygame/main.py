@@ -18,8 +18,9 @@ class Game:
         pygame.display.set_caption("Cat Catch Letters 😺")
         self.clock = pygame.time.Clock()
 
-        self.font_good = pygame.font.SysFont(None, 48, bold=True)
-        self.font_bad = pygame.font.SysFont(None, 36)
+        self.font_good = pygame.font.Font("fonts/GHEAGpalatBld.otf", 48)
+        self.font_bad = pygame.font.Font("fonts/GHEAGpalatBld.otf", 36)
+        self.font_hud = pygame.font.Font("fonts/GHEAGpalatBld.otf", 24)
 
         # --- load cat frames ---
         self.cat_right = self.load_cat("right")
@@ -103,9 +104,11 @@ class Game:
                 if e.type == pygame.QUIT:
                     running = False
 
+            # --- обновления ---
             self.update_cat()
             self.world.update()
 
+            # --- проверка завершения уровня ---
             if self.world.is_finished():
                 nxt = self.world.next_world()
                 if nxt:
@@ -118,10 +121,13 @@ class Game:
                     pygame.display.flip()
                     pygame.time.wait(4000)
                     running = False
+                    continue  # пропускаем отрисовку остального кадра
 
-            self.world.draw(self.screen)
-            self.screen.blit(self.cat_frames[int(self.cat_index)], self.cat_rect)
-
+            # --- РИСОВАНИЕ ---
+            self.screen.fill((255, 255, 255))                      # очищаем экран
+            self.world.draw(self.screen)                            # фон + буквы
+            self.world.draw_hud(self.screen)                        # HUD
+            self.screen.blit(self.cat_frames[int(self.cat_index)], self.cat_rect)  # кот
             pygame.display.flip()
             self.clock.tick(FPS)
 

@@ -20,7 +20,11 @@ class Game:
     def __init__(self):
         pygame.init()
         self.screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+        
         self.camera_x = 0
+        self.camera_target_x = 0
+        self.CAMERA_SPEED = 0.05   # 0.02 — очень плавно, 0.1 — быстрее
+
 
         pygame.display.set_caption("Cat Catch Letters 😺")
         self.clock = pygame.time.Clock()
@@ -36,8 +40,16 @@ class Game:
         self.cat_index = 0
 
         self.cat_x, self.cat_y = SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2
-        self.CAT_BOUNDS = pygame.Rect(0, 100, WORLD_WIDTH, WORLD_HEIGHT - 250)
+        self.CAT_BOUNDS = pygame.Rect(0, 100, WORLD_WIDTH, WORLD_HEIGHT - 150)
 
+        # --- physics ---
+        self.cat_vy = 0
+        self.GRAVITY = 0.8
+        self.JUMP_POWER = -14
+        self.on_ground = False
+
+        self.GROUND_Y = WORLD_HEIGHT - 120   # уровень земли (подбери под фон)
+        
         # --- world system ---
         self.world = world_1_1.World_1_1(self)
         self.world.start()
@@ -59,7 +71,8 @@ class Game:
     def update_cat(self):
         moved = False
         keys = pygame.key.get_pressed()
-
+    
+        # бег по стрелкам
         if keys[pygame.K_LEFT]:
             self.cat_x -= CAT_SPEED
             self.cat_frames = self.cat_left
@@ -68,43 +81,43 @@ class Game:
             self.cat_x += CAT_SPEED
             self.cat_frames = self.cat_right
             moved = True
-        if keys[pygame.K_UP]:
-            self.cat_y -= CAT_SPEED
-        if keys[pygame.K_DOWN]:
-            self.cat_y += CAT_SPEED
-
-        # --- CAMERA FOLLOW ---
-        self.camera_x = self.cat_x - SCREEN_WIDTH // 2
-
-        # ограничения камеры
-        if self.camera_x < 0:
-            self.camera_x = 0
-        if self.camera_x > WORLD_WIDTH - SCREEN_WIDTH:
-            self.camera_x = WORLD_WIDTH - SCREEN_WIDTH
-
-        # mouse follow
-        mx, my = pygame.mouse.get_pos()
-        dx = mx - self.cat_x + self.camera_x
-        dy = my - self.cat_y 
-        dist = math.hypot(dx, dy)
-        if dist > 5:
+    
+        # прыжок
+        if keys[pygame.K_SPACE] and self.on_ground:
+            self.cat_vy = self.JUMP_POWER
+            self.on_ground = False
+    
+        # гравитация
+        self.cat_vy += self.GRAVITY
+        self.cat_y += self.cat_vy
+    
+        if self.cat_y > self.GROUND_Y:
+            self.cat_y = self.GROUND_Y
+            self.cat_vy = 0
+            self.on_ground = True
+    
+        # камера по X
+        self.camera_target_x = self.cat_x - SCREEN_WIDTH // 2
+        self.camera_target_x = max(0, min(self.camera_target_x, WORLD_WIDTH - SCREEN_WIDTH))
+        self.camera_x += (self.camera_target_x - self.camera_x) * self.CAMERA_SPEED
+    
+        # mouse X только
+        mx, _ = pygame.mouse.get_pos()
+        mx_world = mx + self.camera_x
+        dx = mx_world - self.cat_x
+        if abs(dx) > 5:
             self.cat_x += dx * MOUSE_SPEED
-            self.cat_y += dy * MOUSE_SPEED
             self.cat_frames = self.cat_right if dx > 0 else self.cat_left
             moved = True
-
-        # bounds
+    
+        # границы X
         rect = self.cat_rect
         if rect.left < self.CAT_BOUNDS.left:
             self.cat_x += self.CAT_BOUNDS.left - rect.left
         if rect.right > self.CAT_BOUNDS.right:
             self.cat_x -= rect.right - self.CAT_BOUNDS.right
-        if rect.top < self.CAT_BOUNDS.top:
-            self.cat_y += self.CAT_BOUNDS.top - rect.top
-        if rect.bottom > self.CAT_BOUNDS.bottom:
-            self.cat_y -= rect.bottom - self.CAT_BOUNDS.bottom
-
-        # animation
+    
+        # анимация
         if moved:
             self.cat_index += 0.15
             if self.cat_index >= len(self.cat_frames):

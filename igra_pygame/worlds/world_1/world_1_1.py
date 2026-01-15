@@ -23,11 +23,16 @@ class World_1_1(WorldBase):
         self.bg_w = self.bg.get_width()
 
         self.letters = []
-        self.spawn(7)
+        
+        self.letter_count = 7
+
+        self.start_time = pygame.time.get_ticks()
+        self.spawn_delay_start = 2000   # 2 секунды перед первым появлением
+
+        self.spawn_delay = 700          # пауза между появлениями
+        self.last_spawn_time = self.start_time
 
     def spawn(self, count):
-
-
         # Считаем, сколько правильных букв уже на экране
         target_count = sum(1 for l in self.letters if l[0] == self.target)
 
@@ -37,17 +42,13 @@ class World_1_1(WorldBase):
             y = random.randint(140, WORLD_HEIGHT - 60)
             vx = random.choice([-1, 1]) * LETTER_SPEED
             vy = random.choice([-1, 1]) * LETTER_SPEED
-            #Разная скорость для букв
+            # Разная скорость для букв
             # vx = random.choice([-1, 1]) * random.uniform(LETTER_MIN_SPEED, LETTER_MAX_SPEED)
             # vy = random.choice([-1, 1]) * random.uniform(LETTER_MIN_SPEED, LETTER_MAX_SPEED)
             self.letters.append([self.target, x, y, vx, vy])
 
-        while len(self.letters) < count:
-            l = (
-                self.target
-                if random.random() < 0.7
-                else random.choice(self.armenian_letters)
-            )
+        while target_count < 2 and len(self.letters) < count:
+            l = (self.target if random.random() < 0.6 else random.choice(self.armenian_letters))
             x = random.randint(60, WORLD_WIDTH - 60)
             y = random.randint(140, WORLD_HEIGHT - 60)
             vx = random.choice([-1, 1])
@@ -71,8 +72,23 @@ class World_1_1(WorldBase):
             if cat_rect.colliderect(rect):
                 if l[0] == self.target:
                     self.score += 1
-                self.letters.remove(l)
+                    self.letters.remove(l)
+                else:
+                    self.score -= 1
+                    if self.score < 0:
+                        self.score = 0
 
+        now = pygame.time.get_ticks()
+
+        # --- ждём перед первым появлением ---
+        if now - self.start_time < self.spawn_delay_start:
+            return
+        
+        # --- постепенное появление букв ---
+        if now - self.last_spawn_time > self.spawn_delay:
+            self.spawn(self.letter_count)
+            self.last_spawn_time = now
+            
         # --- добиваем буквы до нужного количества ---
         self.spawn(self.letter_count)
 

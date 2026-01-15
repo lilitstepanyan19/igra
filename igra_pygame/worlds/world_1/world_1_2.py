@@ -35,12 +35,15 @@ class World_1_2(WorldBase):
             y = random.randint(140, WORLD_HEIGHT - 60)
             vx = random.choice([-1, 1]) * LETTER_SPEED
             vy = random.choice([-1, 1]) * LETTER_SPEED
+            # Разная скорость для букв
+            # vx = random.choice([-1, 1]) * random.uniform(LETTER_MIN_SPEED, LETTER_MAX_SPEED)
+            # vy = random.choice([-1, 1]) * random.uniform(LETTER_MIN_SPEED, LETTER_MAX_SPEED)
             self.letters.append([self.target, x, y, vx, vy])
 
-        while len(self.letters) < count:
+        while target_count < 2 and len(self.letters) < count:
             l = (
                 self.target
-                if random.random() < 0.7
+                if random.random() < 0.6
                 else random.choice(self.armenian_letters)
             )
             x = random.randint(60, WORLD_WIDTH - 60)
@@ -66,7 +69,11 @@ class World_1_2(WorldBase):
             if cat_rect.colliderect(rect):
                 if l[0] == self.target:
                     self.score += 1
-                self.letters.remove(l)
+                    self.letters.remove(l)
+                else:
+                    self.score -= 1
+                    if self.score < 0:
+                        self.score = 0
 
         # --- добиваем буквы до нужного количества ---
         self.spawn(self.letter_count)

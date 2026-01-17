@@ -1,10 +1,16 @@
 import importlib
+from cat import Cat
+from camera import Camera
 
 
 WORLD_WIDTH = 3000
 WORLD_HEIGHT = 600
 
 WIDTH, HEIGHT = 900, 600
+
+SCREEN_WIDTH = 900
+SCREEN_HEIGHT = 600
+FPS = 60
 
 class WorldBase:
     armenian_letters = "ԱԲԳԴԵԶԷԸԹԺԻԼԽԾԿՀՁՂՃՄՅՆՇՈՉՊՋՌՍՎՏՐՑՈՒՓՔԵՕՖ"
@@ -14,6 +20,8 @@ class WorldBase:
         self.score = 0
         self.need = 1
         self.target = None
+        self.cat = None
+        self.camera = None
 
         # --- определяем мир и уровень по имени класса ---
         name = self.__class__.__name__  # например World_1_1
@@ -22,10 +30,14 @@ class WorldBase:
         self.level_num = int(l)
 
     def start(self):
-        pass
+        self.cat = Cat(SCREEN_WIDTH, SCREEN_HEIGHT, WORLD_WIDTH, WORLD_HEIGHT)
+        self.camera = Camera(WIDTH, WORLD_WIDTH)
 
     def update(self):
-        pass
+        if not self.cat or not self.camera:
+            return
+        self.cat.update(self.camera.camera_x)
+        self.camera.update(self.cat.cat_x)
 
     def draw(self, screen):
         pass

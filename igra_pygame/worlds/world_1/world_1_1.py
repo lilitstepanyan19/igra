@@ -28,6 +28,10 @@ class World_1_1(WorldBase):
         self.spawn_delay = 700  # пауза между появлениями
         self.last_spawn_time = self.start_time
 
+        # фон для букв (например бабочка)
+        self.letter_bg_img = pygame.image.load("images/world_1/letter_bg_left.png").convert_alpha()
+        self.letter_bg_img = pygame.transform.scale(self.letter_bg_img, (100, 100))
+
     def spawn(self, count):
         target_count = sum(1 for l in self.letters if l.char == self.target)
 
@@ -36,7 +40,7 @@ class World_1_1(WorldBase):
             y = random.randint(140, WORLD_HEIGHT - 60)
             vx = random.choice([-1, 1]) * LETTER_SPEED
             vy = random.choice([-1, 1]) * LETTER_SPEED
-            self.letters.append(Letter(self.target, x, y, vx, vy))
+            self.letters.append(Letter(self.target, x, y, vx, vy, self.letter_bg_img))
 
         while target_count < 2 and len(self.letters) < count:
             char = (
@@ -48,7 +52,7 @@ class World_1_1(WorldBase):
             y = random.randint(140, WORLD_HEIGHT - 60)
             vx = random.choice([-1, 1])
             vy = random.choice([-1, 1])
-            self.letters.append(Letter(char, x, y, vx, vy))
+            self.letters.append(Letter(char, x, y, vx, vy, self.letter_bg_img))
 
     def update(self):
         super().update()
@@ -65,7 +69,7 @@ class World_1_1(WorldBase):
                     if now - self.last_hit_time > self.hit_cooldown:
                         self.lives -= 1
                         self.last_hit_time = now
-                
+
         now = pygame.time.get_ticks()
 
         # ждём перед первым появлением

@@ -16,6 +16,7 @@ class Game:
         self.font_bad = pygame.font.Font("fonts/GHEAGpalatBld.otf", 36)
         self.font_hud = pygame.font.Font("fonts/GHEAGpalatBld.otf", 24)
 
+
         # --- world system ---
         self.world = world_1_1.World_1_1(self)
         self.world.start()
@@ -44,14 +45,23 @@ class Game:
                     pygame.time.wait(4000)
                     running = False
                     continue  # пропускаем отрисовку остального кадра
-            
-             # --- ОЧИСТКА ЭКРАНА ---
+
+            if self.world.lives <= 0:
+                self.screen.fill((0, 0, 0))
+                lose = self.font_bad.render("GAME OVER 😿", True, (255, 0, 0))
+                self.screen.blit(lose, (SCREEN_WIDTH // 2 - 120, SCREEN_HEIGHT // 2))
+                pygame.display.flip()
+                pygame.time.wait(3000)
+                running = False
+                continue
+
+            # --- ОЧИСТКА ЭКРАНА ---
             self.screen.fill((255, 255, 255))  # или можно чёрный фон
 
-             # --- РИСУЕМ МИР ---
+            # --- РИСУЕМ МИР ---
             self.world.draw(self.screen)        # фон + буквы
             self.world.draw_hud(self.screen)    # HUD
-            
+
             # --- РИСУЕМ КОТА ЧЕРЕЗ КАМЕРУ ---
             cat = self.world.cat
             cam = self.world.camera

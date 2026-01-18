@@ -29,8 +29,8 @@ class Cat:
 
         # --- physics ---
         self.cat_vy = 0
-        self.GRAVITY = 0.8
-        self.JUMP_POWER = -14
+        self.GRAVITY = 0.6
+        self.JUMP_POWER = -20
         self.on_ground = False
 
         self.GROUND_Y = self.world_height - 120  # уровень земли (подбери под фон)

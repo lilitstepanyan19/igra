@@ -1,4 +1,5 @@
 import importlib
+import pygame
 from cat import Cat
 from camera import Camera
 
@@ -12,6 +13,8 @@ SCREEN_WIDTH = 900
 SCREEN_HEIGHT = 600
 FPS = 60
 
+LIVES_COUNT = 3
+
 class WorldBase:
     armenian_letters = "ԱԲԳԴԵԶԷԸԹԺԻԼԽԾԿՀՁՂՃՄՅՆՇՈՉՊՋՌՍՎՏՐՑՈՒՓՔԵՕՖ"
 
@@ -22,6 +25,13 @@ class WorldBase:
         self.target = None
         self.cat = None
         self.camera = None
+
+        self.lives = LIVES_COUNT
+        self.heart_img = pygame.image.load("images/heart.png").convert_alpha()
+        self.heart_img = pygame.transform.scale(self.heart_img, (32, 32))
+
+        self.hit_cooldown = 1000   # мс (1 секунда)
+        self.last_hit_time = 0
 
         # --- определяем мир и уровень по имени класса ---
         name = self.__class__.__name__  # например World_1_1
@@ -61,7 +71,31 @@ class WorldBase:
         x += target_surf.get_width()
         screen.blit(count_surf, (x, y))
 
-        # Дополнительно: WORLD / LEVEL
+        # --- Большое сердце и количество жизней ---
+        max_heart_size = 80  # максимальный размер сердца
+        min_heart_size = 40  # размер, если lives = 1
+        
+        # размер сердца пропорционален количеству жизней
+        if self.lives > 0:
+            heart_size = min_heart_size + (max_heart_size - min_heart_size) * (self.lives / LIVES_COUNT)
+        else:
+            heart_size = min_heart_size
+
+        heart_img_scaled = pygame.transform.scale(self.heart_img, (int(heart_size), int(heart_size)))
+        # координаты справа сверху
+        heart_x = SCREEN_WIDTH - heart_size - 20
+        heart_y = 20
+        screen.blit(heart_img_scaled, (heart_x, heart_y))
+
+        # показываем число жизней рядом
+        lives_text = f"x {self.lives}"
+        lives_surf = self.game.font_hud.render(lives_text, True, (0, 0, 0))
+        lives_x = SCREEN_WIDTH - heart_size / 2 - lives_surf.get_width() / 2 - 20
+        lives_y = heart_y + (heart_size - lives_surf.get_height()) / LIVES_COUNT
+        screen.blit(lives_surf, (lives_x, lives_y))
+
+
+        # --- WORLD / LEVEL и счет ---
         header_text = f"Աշխարհ {self.world_num}, Փուլ- {self.level_num}   {self.score}/{self.need}"
         header_surf = self.game.font_hud.render(header_text, True, (0, 0, 0))
         screen.blit(header_surf, (20, 20))

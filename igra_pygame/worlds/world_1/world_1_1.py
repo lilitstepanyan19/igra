@@ -61,10 +61,11 @@ class World_1_1(WorldBase):
                     self.score += 1
                     self.letters.remove(letter)
                 else:
-                    self.score -= 1
-                    if self.score < 0:
-                        self.score = 0
-
+                    now = pygame.time.get_ticks()
+                    if now - self.last_hit_time > self.hit_cooldown:
+                        self.lives -= 1
+                        self.last_hit_time = now
+                
         now = pygame.time.get_ticks()
 
         # ждём перед первым появлением

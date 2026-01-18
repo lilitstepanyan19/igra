@@ -1,6 +1,7 @@
 # worlds/world_1/world_1_1.py
 import pygame
 import random
+import os
 from base import WorldBase, WORLD_WIDTH, WORLD_HEIGHT, SCREEN_HEIGHT
 from letter import Letter, LETTER_SPEED  # импортируем новый класс
 
@@ -17,30 +18,30 @@ class World_1_1(WorldBase):
 
         bg_img = pygame.image.load("images/world_1/bg_1.jpg").convert()
         h = SCREEN_HEIGHT
-        scale = h / bg_img.get_height()
+        scale = SCREEN_HEIGHT / bg_img.get_height()
         w = int(bg_img.get_width() * scale)
         self.bg = pygame.transform.smoothscale(bg_img, (w, h))
         self.bg_w = self.bg.get_width()
 
         self.letters = []
+
+        self.load_letter_bgs(self.world_num)
+
         self.start_time = pygame.time.get_ticks()
         self.spawn_delay_start = 2000  # 2 секунды перед первым появлением
         self.spawn_delay = 700  # пауза между появлениями
         self.last_spawn_time = self.start_time
 
-        # фон для букв (например бабочка)
-        self.letter_bg_img = pygame.image.load("images/world_1/letter_bg_left.png").convert_alpha()
-        self.letter_bg_img = pygame.transform.scale(self.letter_bg_img, (100, 100))
-
     def spawn(self, count):
         target_count = sum(1 for l in self.letters if l.char == self.target)
 
         if target_count == 0:
+            letter_bg = random.choice(self.letter_bg_imgs)
             x = random.randint(60, WORLD_WIDTH - 60)
             y = random.randint(140, WORLD_HEIGHT - 60)
             vx = random.choice([-1, 1]) * LETTER_SPEED
             vy = random.choice([-1, 1]) * LETTER_SPEED
-            self.letters.append(Letter(self.target, x, y, vx, vy, self.letter_bg_img))
+            self.letters.append(Letter(self.target, x, y, vx, vy, letter_bg))
 
         while target_count < 2 and len(self.letters) < count:
             char = (
@@ -48,11 +49,12 @@ class World_1_1(WorldBase):
                 if random.random() < 0.6
                 else random.choice(self.armenian_letters)
             )
+            letter_bg = random.choice(self.letter_bg_imgs)
             x = random.randint(60, WORLD_WIDTH - 60)
             y = random.randint(140, WORLD_HEIGHT - 60)
             vx = random.choice([-1, 1])
             vy = random.choice([-1, 1])
-            self.letters.append(Letter(char, x, y, vx, vy, self.letter_bg_img))
+            self.letters.append(Letter(char, x, y, vx, vy, letter_bg))
 
     def update(self):
         super().update()

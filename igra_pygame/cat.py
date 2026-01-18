@@ -1,4 +1,5 @@
 import pygame
+import os
 
 CAT_SPEED = 0.3
 MOUSE_SPEED = 0.02
@@ -37,14 +38,20 @@ class Cat:
 
     def load_cat(self, direction, skin='default'):
         frames = []
-        for i in range(1, 9):
-            img = pygame.image.load(
-                f"images/{skin}/cat_{i}_{direction}.png"
-            ).convert_alpha()
-            img = pygame.transform.scale(img, (120, 120))
-            frames.append(img)
-        return frames
+        folder = f"images/{skin}/"
+        for name in sorted(os.listdir(folder)):
+            # пример имени: cat_1_left.png, cat_2_left.png ...
+            if name.endswith(f"_{direction}.png") and name.startswith("cat_"):
+                path = os.path.join(folder, name)
+                img = pygame.image.load(path).convert_alpha()
+                img = pygame.transform.scale(img, (120, 120))
+                frames.append(img)
 
+        if not frames:
+            raise Exception(f"No cat images for direction '{direction}' in {folder}")
+
+        return frames
+    
     @property
     def cat_rect(self):
         return self.cat_frames[int(self.cat_index)].get_rect(

@@ -12,7 +12,7 @@ class Cat:
         screen_width,
         screen_height,
         world_width,
-        world_height
+        world_height, world_num, level_num
     ):
         self.screen_width = screen_width
         self.screen_height = screen_height
@@ -20,8 +20,8 @@ class Cat:
         self.world_height = world_height
 
         # --- load cat frames ---
-        self.cat_right = self.load_cat("right")
-        self.cat_left = self.load_cat("left")
+        self.cat_right = self.load_cat("right", world_num, level_num)
+        self.cat_left = self.load_cat("left", world_num, level_num)
         self.cat_frames = self.cat_right
         self.cat_index = 0
 
@@ -36,9 +36,9 @@ class Cat:
 
         self.GROUND_Y = self.world_height - 120  # уровень земли (подбери под фон)
 
-    def load_cat(self, direction, skin='default'):
+    def load_cat(self, direction, world_num, level_num, skin='world_1'):
         frames = []
-        folder = f"images/{skin}/"
+        folder = f"images/{skin}/world_{world_num}_{level_num}/person"
         for name in sorted(os.listdir(folder)):
             # пример имени: cat_1_left.png, cat_2_left.png ...
             if name.endswith(f"_{direction}.png") and name.startswith("cat_"):
@@ -51,7 +51,7 @@ class Cat:
             raise Exception(f"No cat images for direction '{direction}' in {folder}")
 
         return frames
-    
+
     @property
     def cat_rect(self):
         return self.cat_frames[int(self.cat_index)].get_rect(

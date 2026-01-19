@@ -16,7 +16,9 @@ class World_1_1(WorldBase):
         self.need = 4
         self.score = 0
 
-        bg_img = pygame.image.load("images/world_1/bg_1.jpg").convert()
+        bg_img = pygame.image.load(
+            f"images/world_{self.world_num}/world_{self.world_num}_{self.level_num}/bg_img/bg_1.jpg"
+        ).convert()
         h = SCREEN_HEIGHT
         scale = SCREEN_HEIGHT / bg_img.get_height()
         w = int(bg_img.get_width() * scale)
@@ -25,7 +27,7 @@ class World_1_1(WorldBase):
 
         self.letters = []
 
-        self.load_letter_bgs(self.world_num)
+        self.load_letter_bgs(self.world_num, self.level_num)
 
         self.start_time = pygame.time.get_ticks()
         self.spawn_delay_start = 2000  # 2 секунды перед первым появлением

@@ -43,12 +43,12 @@ class WorldBase:
         self.level_num = int(l)
 
     def start(self):
-        self.cat = Cat(SCREEN_WIDTH, SCREEN_HEIGHT, WORLD_WIDTH, WORLD_HEIGHT)
+        self.cat = Cat(SCREEN_WIDTH, SCREEN_HEIGHT, WORLD_WIDTH, WORLD_HEIGHT, self.world_num, self.level_num)
         self.camera = Camera(WIDTH, WORLD_WIDTH)
 
-    def load_letter_bgs(self, world_num, folder_name="letter_bg"):
+    def load_letter_bgs(self, world_num, level_num, folder_name="letter_bg"):
         """Динамически загружает все картинки для букв данного мира"""
-        folder = f"images/world_{world_num}/{folder_name}/"
+        folder = f"images/world_{world_num}/world_{world_num}_{level_num}/{folder_name}/"
         if not os.path.exists(folder):
             return []
 

@@ -1,7 +1,7 @@
 # letter.py
 import pygame
 
-LETTER_SPEED = 0.5
+LETTER_SPEED = 0.9
 LETTER_MIN_SPEED = 0.5
 LETTER_MAX_SPEED = 2.0
 

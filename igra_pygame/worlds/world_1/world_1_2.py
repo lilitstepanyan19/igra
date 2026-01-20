@@ -1,62 +1,79 @@
-# worlds/world_1/world_1_1.py
+# worlds/world_1/world_1_2.py
 import pygame
 import random
-
 from base import WorldBase, WORLD_WIDTH, WORLD_HEIGHT, SCREEN_HEIGHT
-from letter import Letter, LETTER_SPEED  # импортируем новый класс
-from rain import RainDrop
+from letter import Letter, LETTER_SPEED  # импортируем класс Letter
+
+
+class RainDrop:
+    def __init__(self, x, y, speed, img):
+        self.x = x
+        self.y = y
+        self.speed = speed
+        self.img = img
+
+    def update(self, world_width, world_height):
+        self.y += self.speed
+        self.x -= self.speed * 0.5  # наклон капли справа налево
+        if self.y > world_height or self.x < -50:
+            self.y = random.randint(-200, -50)
+            self.x = random.randint(0, world_width)
+
+    def draw(self, screen, camera_x):
+        screen.blit(self.img, (self.x - camera_x, self.y))
+
 
 class World_1_2(WorldBase):
-
     def start(self):
         super().start()  # ← создаёт self.cat и self.camera
+
         self.target = self.armenian_letters[self.world_num - 1]
         self.letter_count = 7
-
         self.need = 4
         self.score = 0
 
+        # ===== ФОН =====
         bg_img = pygame.image.load(
             f"images/world_{self.world_num}/world_{self.world_num}_{self.level_num}/bg_img/bg_1.jpg"
         ).convert()
-        h = SCREEN_HEIGHT
         scale = SCREEN_HEIGHT / bg_img.get_height()
         w = int(bg_img.get_width() * scale)
+        h = SCREEN_HEIGHT
         self.bg = pygame.transform.smoothscale(bg_img, (w, h))
         self.bg_w = self.bg.get_width()
 
         self.letters = []
         self.load_letter_bgs(self.world_num, self.level_num)
 
-        # ===== RAIN =====
-        self.rain_back = []
-        self.rain_front = []
-        self.splashes = []
+        # ===== ДОЖДЬ =====
+        drop_img = pygame.image.load(
+            "images/world_1/world_1_2/rain/rain_1.png"
+        ).convert_alpha()
+        drop_img = pygame.transform.scale(drop_img, (12, 35))  # ширина/высота капли
 
-        for _ in range(180):  # дальний слой
-            x = random.randint(0, WORLD_WIDTH)
-            y = random.randint(0, WORLD_HEIGHT)
-            speed = random.randint(5, 10)
-            length = random.randint(10, 13)
-            width = random.randint(20, 25)    # шире
-            self.rain_front.append(RainDrop(x, y, speed, length, width))
+        # задний слой
+        self.rain_back = [
+            RainDrop(
+                random.randint(0, WORLD_WIDTH),
+                random.randint(0, WORLD_HEIGHT),
+                random.uniform(1, 2),
+                drop_img,
+            )
+            for _ in range(1500)
+        ]
 
-        for _ in range(140):  # передний слой
-            x = random.randint(0, WORLD_WIDTH)
-            y = random.randint(0, WORLD_HEIGHT)
-            speed = random.randint(10, 15)
-            length = random.randint(16, 20)
-            width = random.randint(30, 36)    # шире
-            self.rain_front.append(RainDrop(x, y, speed, length, width))
+        # передний слой
+        self.rain_front = [
+            RainDrop(
+                random.randint(0, WORLD_WIDTH),
+                random.randint(0, WORLD_HEIGHT),
+                random.uniform(2, 4),
+                drop_img,
+            )
+            for _ in range(500)
+        ]
 
-
-        # ===== PUDDLES =====
-        self.puddles = []
-        for _ in range(12):
-            x = random.randint(0, WORLD_WIDTH)
-            w = random.randint(40, 90)
-            self.puddles.append((x, w))
-
+        # ===== ВРЕМЯ ДЛЯ ПОЯВЛЕНИЯ БУКВ =====
         self.start_time = pygame.time.get_ticks()
         self.spawn_delay_start = 2000  # 2 секунды перед первым появлением
         self.spawn_delay = 700  # пауза между появлениями
@@ -73,7 +90,10 @@ class World_1_2(WorldBase):
             vy = random.choice([-1, 1]) * LETTER_SPEED
             self.letters.append(Letter(self.target, x, y, vx, vy, letter_bg))
 
-        while target_count < 2 and len(self.letters) < count:
+        while (
+            sum(1 for l in self.letters if l.char == self.target) < 2
+            and len(self.letters) < count
+        ):
             char = (
                 self.target
                 if random.random() < 0.6
@@ -82,12 +102,17 @@ class World_1_2(WorldBase):
             letter_bg = random.choice(self.letter_bg_imgs)
             x = random.randint(60, WORLD_WIDTH - 60)
             y = random.randint(140, WORLD_HEIGHT - 60)
-            vx = random.choice([-1, 1])
-            vy = random.choice([-1, 1])
+            vx = random.choice([-1, 1]) * LETTER_SPEED
+            vy = random.choice([-1, 1]) * LETTER_SPEED
             self.letters.append(Letter(char, x, y, vx, vy, letter_bg))
 
     def update(self):
         super().update()
+
+        # обновление дождя
+        for drop in self.rain_back + self.rain_front:
+            drop.update(WORLD_WIDTH, WORLD_HEIGHT)
+
         cat_rect = self.cat.cat_rect
 
         for letter in self.letters[:]:
@@ -102,31 +127,13 @@ class World_1_2(WorldBase):
                         self.lives -= 1
                         self.last_hit_time = now
 
-        # rain
-        for drop in self.rain_back:
-            drop.update(WORLD_WIDTH, WORLD_HEIGHT, self.splashes)
-
-        for drop in self.rain_front:
-            drop.update(WORLD_WIDTH, WORLD_HEIGHT, self.splashes)
-
-        # splashes
-        for splash in self.splashes[:]:
-            splash.update()
-            if splash.life <= 0:
-                self.splashes.remove(splash)
-
+        # появление букв
         now = pygame.time.get_ticks()
-
-        # ждём перед первым появлением
         if now - self.start_time < self.spawn_delay_start:
             return
-
-        # постепенное появление букв
         if now - self.last_spawn_time > self.spawn_delay:
             self.spawn(self.letter_count)
             self.last_spawn_time = now
-
-        # добиваем буквы до нужного количества
         self.spawn(self.letter_count)
 
     def draw(self, screen):
@@ -134,24 +141,9 @@ class World_1_2(WorldBase):
         for x in range(0, WORLD_WIDTH, self.bg_w):
             screen.blit(self.bg, (x - self.camera.camera_x, 0))
 
-        # RAIN BACK
+        # дождь сзади
         for drop in self.rain_back:
-            drop.draw(screen, self.camera.camera_x, (18, 128, 209))
-
-        for drop in self.rain_front:
-            drop.draw(screen, self.camera.camera_x, (18, 128, 209))
-
-        # PUDDLES
-        for x, w in self.puddles:
-            pygame.draw.ellipse(
-                screen,
-                (120, 120, 180),
-                (x - self.camera.camera_x, WORLD_HEIGHT - 18, w, 8),
-            )
-
-        # SPLASHES
-        for splash in self.splashes:
-            splash.draw(screen, self.camera.camera_x)
+            drop.draw(screen, self.camera.camera_x)
 
         # буквы
         for letter in self.letters:
@@ -162,3 +154,7 @@ class World_1_2(WorldBase):
                 self.camera.camera_x,
                 self.target,
             )
+
+        # дождь спереди
+        for drop in self.rain_front:
+            drop.draw(screen, self.camera.camera_x)

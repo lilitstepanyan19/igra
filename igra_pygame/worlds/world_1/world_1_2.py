@@ -2,7 +2,8 @@
 import pygame
 import random
 from base import WorldBase, WORLD_WIDTH, WORLD_HEIGHT, SCREEN_HEIGHT
-from letter import Letter, LETTER_SPEED  # импортируем класс Letter
+from letter import Letter, LETTER_SPEED
+import letter  # импортируем класс Letter
 
 
 class RainDrop:
@@ -14,8 +15,11 @@ class RainDrop:
 
     def update(self, world_width, world_height):
         self.y += self.speed
-        self.x -= self.speed * 0.5  # наклон капли справа налево
-        if self.y > world_height or self.x < -50:
+        self.x -= self.speed * 0.4  # наклон капли справа налево
+
+        # нижняя граница немного выше пола (например, 50 пикселей выше)
+        max_y = world_height - 50
+        if self.y > max_y or self.x < -50:
             self.y = random.randint(-200, -50)
             self.x = random.randint(0, world_width)
 
@@ -27,8 +31,9 @@ class World_1_2(WorldBase):
     def start(self):
         super().start()  # ← создаёт self.cat и self.camera
 
-        self.target = self.armenian_letters[self.world_num - 1]
-        self.letter_count = 7
+        self.target = self.armenian_letters[self.world_num - 1].lower()
+        self.hud_target_color = (20, 60, 222)  # синий цвет для цели
+        self.letter_count = 20
         self.need = 4
         self.score = 0
 
@@ -46,17 +51,15 @@ class World_1_2(WorldBase):
         self.load_letter_bgs(self.world_num, self.level_num)
 
         # ===== ДОЖДЬ =====
-        drop_img = pygame.image.load(
-            "images/world_1/world_1_2/rain/rain_1.png"
-        ).convert_alpha()
-        drop_img = pygame.transform.scale(drop_img, (12, 35))  # ширина/высота капли
+        drop_img = pygame.image.load("images/world_1/world_1_2/rain/rain_1.png").convert_alpha()
+        drop_img = pygame.transform.scale(drop_img, (4, 60))  # ширина/высота капли
 
         # задний слой
         self.rain_back = [
             RainDrop(
                 random.randint(0, WORLD_WIDTH),
                 random.randint(0, WORLD_HEIGHT),
-                random.uniform(1, 2),
+                random.uniform(2, 3),
                 drop_img,
             )
             for _ in range(1500)
@@ -67,16 +70,16 @@ class World_1_2(WorldBase):
             RainDrop(
                 random.randint(0, WORLD_WIDTH),
                 random.randint(0, WORLD_HEIGHT),
-                random.uniform(2, 4),
+                random.uniform(4, 5),
                 drop_img,
             )
-            for _ in range(500)
+            for _ in range(1000)
         ]
 
         # ===== ВРЕМЯ ДЛЯ ПОЯВЛЕНИЯ БУКВ =====
         self.start_time = pygame.time.get_ticks()
-        self.spawn_delay_start = 2000  # 2 секунды перед первым появлением
-        self.spawn_delay = 700  # пауза между появлениями
+        self.spawn_delay_start = 20  # 2 секунды перед первым появлением
+        self.spawn_delay = 20  # пауза между появлениями
         self.last_spawn_time = self.start_time
 
     def spawn(self, count):
@@ -90,10 +93,7 @@ class World_1_2(WorldBase):
             vy = random.choice([-1, 1]) * LETTER_SPEED
             self.letters.append(Letter(self.target, x, y, vx, vy, letter_bg))
 
-        while (
-            sum(1 for l in self.letters if l.char == self.target) < 2
-            and len(self.letters) < count
-        ):
+        while target_count < 2 and len(self.letters) < count:
             char = (
                 self.target
                 if random.random() < 0.6
@@ -104,7 +104,7 @@ class World_1_2(WorldBase):
             y = random.randint(140, WORLD_HEIGHT - 60)
             vx = random.choice([-1, 1]) * LETTER_SPEED
             vy = random.choice([-1, 1]) * LETTER_SPEED
-            self.letters.append(Letter(char, x, y, vx, vy, letter_bg))
+            self.letters.append(Letter(char.lower(), x, y, vx, vy, letter_bg))
 
     def update(self):
         super().update()
@@ -147,13 +147,25 @@ class World_1_2(WorldBase):
 
         # буквы
         for letter in self.letters:
-            letter.draw(
-                screen,
-                self.game.font_good,
-                self.game.font_bad,
-                self.camera.camera_x,
-                self.target,
-            )
+            x = letter.x - self.camera.camera_x
+            y = letter.y
+
+            # фон под буквой
+            if letter.bg_img:
+                rect = letter.bg_img.get_rect(center=(x, y))
+                screen.blit(letter.bg_img, rect)
+
+            # другие цвета ТОЛЬКО для этого мира
+            if letter.char == self.target:
+                color = self.hud_target_color 
+                font = self.game.font_good
+            else:
+                color = (41, 42, 74)  # тёмно-синий
+                font = self.game.font_bad
+
+            text = font.render(letter.char, True, color)
+            text_rect = text.get_rect(center=(x, y))
+            screen.blit(text, text_rect)
 
         # дождь спереди
         for drop in self.rain_front:

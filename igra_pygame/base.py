@@ -5,7 +5,7 @@ from cat import Cat
 from camera import Camera
 
 
-WORLD_WIDTH = 10000
+WORLD_WIDTH = 15000
 WORLD_HEIGHT = 600
 
 WIDTH, HEIGHT = 900, 600
@@ -90,7 +90,8 @@ class WorldBase:
             screen.blit(bg_img, bg_rect)
 
             # текст поверх фона
-            target_surf = self.game.font_good.render(self.target, True, (0, 180, 0))
+            color = getattr(self, "hud_target_color", (0, 180, 0))  # если нет — зелёный
+            target_surf = self.game.font_good.render(self.target, True, color)
             target_rect = target_surf.get_rect(center=bg_rect.center)
             screen.blit(target_surf, target_rect)
             x += bg_rect.width

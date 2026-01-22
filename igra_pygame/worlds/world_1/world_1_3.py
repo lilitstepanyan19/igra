@@ -6,7 +6,7 @@ from base import WorldBase, WORLD_WIDTH, WORLD_HEIGHT, SCREEN_HEIGHT
 from letter import Letter, LETTER_SPEED  # импортируем новый класс
 
 
-class World_1_1(WorldBase):
+class World_1_3(WorldBase):
 
     def start(self):
         super().start()  # ← создаёт self.cat и self.camera

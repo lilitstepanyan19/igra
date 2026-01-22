@@ -46,20 +46,39 @@ class WorldBase:
         self.cat = Cat(SCREEN_WIDTH, SCREEN_HEIGHT, WORLD_WIDTH, WORLD_HEIGHT, self.world_num, self.level_num)
         self.camera = Camera(WIDTH, WORLD_WIDTH)
 
+    def load_bg(self):
+        path = f"images/world_{self.world_num}/world_{self.world_num}_{self.level_num}/bg_img/bg_1.jpg"
+
+        if not os.path.exists(path):
+            path = "images/world_1/world_1_1/bg_img/bg_1.jpg"
+
+        return pygame.image.load(path).convert()
+    
     def load_letter_bgs(self, world_num, level_num, folder_name="letter_bg"):
-        """Динамически загружает все картинки для букв данного мира"""
         folder = f"images/world_{world_num}/world_{world_num}_{level_num}/{folder_name}/"
-        if not os.path.exists(folder):
-            return []
 
         imgs = []
-        for name in sorted(os.listdir(folder)):
-            if name.startswith("letter_bg") and name.endswith(".png"):
-                path = os.path.join(folder, name)
-                img = pygame.image.load(path).convert_alpha()
-                imgs.append(img)
+    
+        if os.path.exists(folder):
+            for name in sorted(os.listdir(folder)):
+                if name.startswith("letter_bg") and name.endswith(".png"):
+                    path = os.path.join(folder, name)
+                    img = pygame.image.load(path).convert_alpha()
+                    imgs.append(img)
+    
+        # 👉 если в мире нет своих фонов — берём из world_1_1
+        if not imgs:
+            fallback = "images/world_1/world_1_1/letter_bg/"
+            if os.path.exists(fallback):
+                for name in sorted(os.listdir(fallback)):
+                    if name.startswith("letter_bg") and name.endswith(".png"):
+                        path = os.path.join(fallback, name)
+                        img = pygame.image.load(path).convert_alpha()
+                        imgs.append(img)
+    
         self.letter_bg_imgs = imgs
         return imgs
+
 
     def update(self):
         if not self.cat or not self.camera:

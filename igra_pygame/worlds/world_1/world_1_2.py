@@ -38,9 +38,8 @@ class World_1_2(WorldBase):
         self.score = 0
 
         # ===== ФОН =====
-        bg_img = pygame.image.load(
-            f"images/world_{self.world_num}/world_{self.world_num}_{self.level_num}/bg_img/bg_1.jpg"
-        ).convert()
+        bg_img = self.load_bg()
+
         scale = SCREEN_HEIGHT / bg_img.get_height()
         w = int(bg_img.get_width() * scale)
         h = SCREEN_HEIGHT

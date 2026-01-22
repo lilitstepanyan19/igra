@@ -12,7 +12,9 @@ class Cat:
         screen_width,
         screen_height,
         world_width,
-        world_height, world_num, level_num
+        world_height,
+        world_num,
+        level_num,
     ):
         self.screen_width = screen_width
         self.screen_height = screen_height
@@ -39,6 +41,10 @@ class Cat:
     def load_cat(self, direction, world_num, level_num, skin='world_1'):
         frames = []
         folder = f"images/{skin}/world_{world_num}_{level_num}/person"
+        # ✅ если папки нет — берём world_1_1
+        if not os.path.exists(folder):
+            folder = f"images/{skin}/world_1_1/person"
+
         for name in sorted(os.listdir(folder)):
             # пример имени: cat_1_left.png, cat_2_left.png ...
             if name.endswith(f"_{direction}.png") and name.startswith("cat_"):

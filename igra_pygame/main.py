@@ -2,7 +2,7 @@ import pygame
 import sys
 from base import SCREEN_WIDTH, SCREEN_HEIGHT, FPS
 
-from worlds.world_1 import world_1_1, world_1_2
+from worlds.world_1 import world_1_1, world_1_3
 
 class Game:
     def __init__(self):
@@ -18,7 +18,7 @@ class Game:
 
 
         # --- world system ---
-        self.world = world_1_2.World_1_2(self)
+        self.world = world_1_3.World_1_3(self)
         self.world.start()
 
     def run(self):

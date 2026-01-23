@@ -47,7 +47,7 @@ class WorldBase:
         self.camera = Camera(WIDTH, WORLD_WIDTH)
 
     def load_bg(self):
-        path = f"images/world_{self.world_num}/world_{self.world_num}_{self.level_num}/bg_img/bg_1.jpg"
+        path = f"images/world_{self.world_num}/world_{self.world_num}_{self.level_num}/bg_img/bg_1.png"
 
         if not os.path.exists(path):
             path = "images/world_1/world_1_1/bg_img/bg_1.jpg"
@@ -75,7 +75,15 @@ class WorldBase:
                         path = os.path.join(fallback, name)
                         img = pygame.image.load(path).convert_alpha()
                         imgs.append(img)
-    
+
+        # ===== обработка фонов букв (общие параметры) =====
+        new_imgs = []
+        for img in imgs:
+            img = pygame.transform.smoothscale(img, (80, 80))  # размер
+            img.set_alpha(220)  # прозрачность
+            new_imgs.append(img)
+        
+        imgs = new_imgs
         self.letter_bg_imgs = imgs
         return imgs
 

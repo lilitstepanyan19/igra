@@ -1,7 +1,5 @@
-# worlds/world_1/world_1_1.py
 import pygame
 import random
-import os
 from base import WorldBase, WORLD_WIDTH, WORLD_HEIGHT, SCREEN_HEIGHT
 from letter import Letter, LETTER_SPEED  # импортируем новый класс
 
@@ -9,6 +7,7 @@ from letter import Letter, LETTER_SPEED  # импортируем новый к�
 class World_1_1(WorldBase):
 
     def start(self):
+        self.person_name = "cat"
         super().start()  # ← создаёт self.cat и self.camera
         self.target = self.armenian_letters[self.world_num - 1]
         self.letter_count = 7

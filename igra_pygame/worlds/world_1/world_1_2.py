@@ -1,9 +1,8 @@
-# worlds/world_1/world_1_2.py
 import pygame
 import random
 from base import WorldBase, WORLD_WIDTH, WORLD_HEIGHT, SCREEN_HEIGHT
 from letter import Letter, LETTER_SPEED
-import letter  # импортируем класс Letter
+
 
 
 class RainDrop:
@@ -29,6 +28,7 @@ class RainDrop:
 
 class World_1_2(WorldBase):
     def start(self):
+        self.person_name = "cat"
         super().start()  # ← создаёт self.cat и self.camera
 
         self.target = self.armenian_letters[self.world_num - 1].lower()

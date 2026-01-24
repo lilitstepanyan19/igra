@@ -15,6 +15,7 @@ class Cat:
         world_height,
         world_num,
         level_num,
+        person_name="cat",  # новый аргумент
     ):
         self.screen_width = screen_width
         self.screen_height = screen_height
@@ -22,8 +23,8 @@ class Cat:
         self.world_height = world_height
 
         # --- load cat frames ---
-        self.cat_right = self.load_cat("right", world_num, level_num)
-        self.cat_left = self.load_cat("left", world_num, level_num)
+        self.cat_right = self.load_cat("right", world_num, level_num, person_name)
+        self.cat_left = self.load_cat("left", world_num, level_num, person_name)
         self.cat_frames = self.cat_right
         self.cat_index = 0
 
@@ -36,25 +37,29 @@ class Cat:
         self.JUMP_POWER = -20
         self.on_ground = False
 
-        self.GROUND_Y = self.world_height - 120  # уровень земли (подбери под фон)
+        self.GROUND_Y = self.world_height - 120  # уровень земли
 
-    def load_cat(self, direction, world_num, level_num, skin='world_1'):
+    def load_cat(self, direction, world_num, level_num, person_name="cat"):
         frames = []
-        folder = f"images/{skin}/world_{world_num}_{level_num}/person"
-        # ✅ если папки нет — берём world_1_1
+        folder = f"images/world_{world_num}/world_{world_num}_{level_num}/person"
         if not os.path.exists(folder):
-            folder = f"images/{skin}/world_1_1/person"
+            folder = f"images/world_1/world_1_1/person"
 
         for name in sorted(os.listdir(folder)):
-            # пример имени: cat_1_left.png, cat_2_left.png ...
-            if name.endswith(f"_{direction}.png") and name.startswith("cat_"):
+            if name.endswith(f"_{direction}.png") and name.startswith(
+                f"{person_name}_"
+            ):
                 path = os.path.join(folder, name)
-                img = pygame.image.load(path).convert_alpha()
-                img = pygame.transform.scale(img, (120, 120))
-                frames.append(img)
-
+                try:
+                    img = pygame.image.load(path).convert_alpha()
+                    img = pygame.transform.scale(img, (120, 120))
+                    frames.append(img)
+                except pygame.error as e:
+                    print(f"Не удалось загрузить {path}: {e}")
         if not frames:
-            raise Exception(f"No cat images for direction '{direction}' in {folder}")
+            raise Exception(
+                f"No cat images for '{person_name}' direction '{direction}' in {folder}"
+            )
 
         return frames
 

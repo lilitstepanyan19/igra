@@ -17,7 +17,7 @@ FPS = 60
 LIVES_COUNT = 3
 
 class WorldBase:
-    armenian_letters = "ԱԲԳԴԵԶԷԸԹԺԻԼԽԾԿՀՁՂՃՄՅՆՇՈՉՊՋՌՍՎՏՐՑՈՒՓՔԵՕՖ"
+    armenian_letters = "ԱՍԲԳԴԵԶԷԸԹԺԻԼԽԾԿՀՁՂՃՄՅՆՇՈՉՊՋՌՎՏՐՑՈՒՓՔԵՕՖ"
 
     def __init__(self, game):
         self.game = game
@@ -26,6 +26,8 @@ class WorldBase:
         self.target = None
         self.cat = None
         self.camera = None
+
+        self.person_name = "cat"
 
         self.lives = LIVES_COUNT
         self.heart_img = pygame.image.load("images/heart.png").convert_alpha()
@@ -43,29 +45,37 @@ class WorldBase:
         self.level_num = int(l)
 
     def start(self):
-        self.cat = Cat(SCREEN_WIDTH, SCREEN_HEIGHT, WORLD_WIDTH, WORLD_HEIGHT, self.world_num, self.level_num)
+        self.cat = Cat(
+            SCREEN_WIDTH,
+            SCREEN_HEIGHT,
+            WORLD_WIDTH,
+            WORLD_HEIGHT,
+            self.world_num,
+            self.level_num,
+            self.person_name,
+        )
         self.camera = Camera(WIDTH, WORLD_WIDTH)
 
-    def load_bg(self):
-        path = f"images/world_{self.world_num}/world_{self.world_num}_{self.level_num}/bg_img/bg_1.png"
+    def load_bg(self, bg_img_num=1):
+        path = f"images/world_{self.world_num}/world_{self.world_num}_{self.level_num}/bg_img/bg_{bg_img_num}.png"
 
         if not os.path.exists(path):
-            path = "images/world_1/world_1_1/bg_img/bg_1.jpg"
+            path = "images/world_1/world_1_1/bg_img/bg_1.png"
 
         return pygame.image.load(path).convert()
-    
+
     def load_letter_bgs(self, world_num, level_num, folder_name="letter_bg"):
         folder = f"images/world_{world_num}/world_{world_num}_{level_num}/{folder_name}/"
 
         imgs = []
-    
+
         if os.path.exists(folder):
             for name in sorted(os.listdir(folder)):
                 if name.startswith("letter_bg") and name.endswith(".png"):
                     path = os.path.join(folder, name)
                     img = pygame.image.load(path).convert_alpha()
                     imgs.append(img)
-    
+
         # 👉 если в мире нет своих фонов — берём из world_1_1
         if not imgs:
             fallback = "images/world_1/world_1_1/letter_bg/"
@@ -82,11 +92,10 @@ class WorldBase:
             img = pygame.transform.smoothscale(img, (80, 80))  # размер
             img.set_alpha(220)  # прозрачность
             new_imgs.append(img)
-        
+
         imgs = new_imgs
         self.letter_bg_imgs = imgs
         return imgs
-
 
     def update(self):
         if not self.cat or not self.camera:

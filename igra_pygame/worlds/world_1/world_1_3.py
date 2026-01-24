@@ -1,4 +1,3 @@
-# worlds/world_1/world_1_1.py
 import pygame
 import random
 import os
@@ -10,6 +9,7 @@ from letter import Letter, LETTER_SPEED  # импортируем новый к�
 class World_1_3(WorldBase):
 
     def start(self):
+        self.person_name = "cat"
         super().start()  # ← создаёт self.cat и self.camera
         self.target = self.armenian_letters[self.world_num - 1]
         self.letter_count = 20
@@ -58,7 +58,6 @@ class World_1_3(WorldBase):
         self.sun_float_speed = 0.2  # скорость плавания
         self.sun_time = 0
 
-
     def spawn(self, count):
         target_count = sum(1 for l in self.letters if l.char == self.target)
 
@@ -95,7 +94,6 @@ class World_1_3(WorldBase):
 
             self.sun_time += self.sun_float_speed
 
-
         for letter in self.letters[:]:
             letter.update(WORLD_WIDTH, WORLD_HEIGHT)
             if letter.check_collision(cat_rect):
@@ -127,7 +125,7 @@ class World_1_3(WorldBase):
         for x in range(0, WORLD_WIDTH, self.bg_w):
             screen.blit(self.bg, (x - self.camera.camera_x, 0))
 
-       # 🌞 солнце поверх фона
+        # 🌞 солнце поверх фона
         if self.sun_imgs:
             img = self.sun_imgs[int(self.sun_index)]
 
@@ -144,8 +142,6 @@ class World_1_3(WorldBase):
             y_offset = int(math.sin(self.sun_time) * self.sun_float_amp)
 
             screen.blit(img, (self.sun_x, self.sun_y + y_offset))
-
-
 
         # буквы
         for letter in self.letters:

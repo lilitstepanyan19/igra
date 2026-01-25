@@ -62,7 +62,7 @@ class WorldBase:
         if not os.path.exists(path):
             path = "images/world_1/world_1_1/bg_img/bg_1.png"
 
-        return pygame.image.load(path).convert()
+        return pygame.image.load(path).convert_alpha()
 
     def load_letter_bgs(self, world_num, level_num, folder_name="letter_bg"):
         folder = f"images/world_{world_num}/world_{world_num}_{level_num}/{folder_name}/"
@@ -89,7 +89,7 @@ class WorldBase:
         # ===== обработка фонов букв (общие параметры) =====
         new_imgs = []
         for img in imgs:
-            img = pygame.transform.smoothscale(img, (80, 80))  # размер
+            img = pygame.transform.smoothscale(img, (80, 80)).convert_alpha()  # размер
             img.set_alpha(220)  # прозрачность
             new_imgs.append(img)
 

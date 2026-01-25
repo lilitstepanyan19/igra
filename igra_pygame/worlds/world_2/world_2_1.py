@@ -10,18 +10,25 @@ class World_2_1(WorldBase):
         self.person_name = "squirrel" 
         super().start()  # ← создаёт self.cat и self.camera
         self.target = self.armenian_letters[self.world_num - 1]
-        self.letter_count = 7
+        self.letter_count = 20
 
         self.need = 4
         self.score = 0
 
         bg_img = self.load_bg()
-
+        bg_img_front = self.load_bg(2)
+        # задний фон
         h = SCREEN_HEIGHT
         scale = SCREEN_HEIGHT / bg_img.get_height()
         w = int(bg_img.get_width() * scale)
         self.bg = pygame.transform.smoothscale(bg_img, (w, h))
         self.bg_w = self.bg.get_width()
+
+        # передний фон
+        scale_f = SCREEN_HEIGHT / bg_img_front.get_height()
+        w_f = int(bg_img_front.get_width() * scale_f)
+        self.bg_front = pygame.transform.smoothscale(bg_img_front, (w_f, h))
+        self.bg_front_w = self.bg_front.get_width()
 
         self.letters = []
 
@@ -40,7 +47,7 @@ class World_2_1(WorldBase):
             x = random.randint(60, WORLD_WIDTH - 60)
             y = random.randint(140, WORLD_HEIGHT - 60)
             vx = random.choice([-1, 1]) * LETTER_SPEED
-            vy = random.choice([-1, 1]) * LETTER_SPEED
+            vy = random.uniform(1.5, 2.5) * LETTER_SPEED
             self.letters.append(Letter(self.target, x, y, vx, vy, letter_bg))
 
         while target_count < 2 and len(self.letters) < count:
@@ -53,7 +60,7 @@ class World_2_1(WorldBase):
             x = random.randint(60, WORLD_WIDTH - 60)
             y = random.randint(140, WORLD_HEIGHT - 60)
             vx = random.choice([-1, 1])
-            vy = random.choice([-1, 1])
+            vy = random.uniform(1.5, 2.5) * LETTER_SPEED
             self.letters.append(Letter(char, x, y, vx, vy, letter_bg))
 
     def update(self):
@@ -100,3 +107,9 @@ class World_2_1(WorldBase):
                 self.camera.camera_x,
                 self.target,
             )
+
+        self.cat.draw(screen, self.camera.camera_x)
+
+        # --- передний фон (поверх персонажа) ---
+        for x in range(0, WORLD_WIDTH, self.bg_front_w):
+            screen.blit(self.bg_front, (x - self.camera.camera_x, 0))

@@ -2,6 +2,7 @@ import pygame
 import os
 
 CAT_SPEED = 0.3
+CAT_ANIM_SPEED = 0.15
 MOUSE_SPEED = 0.02
 
 
@@ -115,8 +116,14 @@ class Cat:
 
         # анимация
         if moved:
-            self.cat_index += 0.15
+            self.cat_index += CAT_ANIM_SPEED
             if self.cat_index >= len(self.cat_frames):
                 self.cat_index = 0
         else:
             self.cat_index = 0
+
+    def draw(self, screen, camera_x):
+        """Рисует кота на экране с учётом камеры"""
+        frame = self.cat_frames[int(self.cat_index)]
+        rect = frame.get_rect(center=(self.cat_x - camera_x, self.cat_y))
+        screen.blit(frame, rect)

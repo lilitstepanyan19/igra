@@ -5,7 +5,6 @@ CAT_SPEED = 0.3
 CAT_ANIM_SPEED = 0.15
 MOUSE_SPEED = 0.02
 
-
 class Cat:
 
     def __init__(

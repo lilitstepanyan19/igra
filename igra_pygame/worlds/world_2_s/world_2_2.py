@@ -9,6 +9,7 @@ from letter import Letter, LETTER_SPEED  # импортируем новый к�
 class World_2_2(WorldBase):
 
     def start(self):
+        self.person_name = "squirrel"
         super().start()  # ← создаёт self.cat и self.camera
         self.target = self.armenian_letters[self.world_num - 1]
         self.letter_count = 7

@@ -1,14 +1,17 @@
 import pygame
 import sys
+import importlib
+import os
 from base import SCREEN_WIDTH, SCREEN_HEIGHT, FPS
+from save import load_progress, save_progress, SAVE_FILE
 
-from worlds.world_2 import world_2_1
+from worlds.world_1_a.world_1_1 import World_1_1  # стартовый мир
+
 
 class Game:
     def __init__(self):
         pygame.init()
         self.screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
-
         pygame.display.set_caption("Cat Catch Letters 😺")
         self.clock = pygame.time.Clock()
 
@@ -16,12 +19,108 @@ class Game:
         self.font_bad = pygame.font.Font("fonts/GHEAGpalatBld.otf", 36)
         self.font_hud = pygame.font.Font("fonts/GHEAGpalatBld.otf", 24)
 
+        self.world = None
 
-        # --- world system ---
-        self.world = world_2_1.World_2_1(self)
-        self.world.start()
+    def start_screen(self):
+        """Экран с кнопками Продолжить / Новая игра"""
+        running = True
+        while running:
+            self.screen.fill((200, 230, 255))  # светлый фон
+
+            # --- Заголовок ---
+            title = self.font_good.render("Cat Catch Letters 😺", True, (0, 0, 0))
+            self.screen.blit(title, (SCREEN_WIDTH // 2 - title.get_width() // 2, 100))
+
+            # --- Кнопки ---
+            mouse_x, mouse_y = pygame.mouse.get_pos()
+            buttons = []
+
+            # Продолжить
+            cont_text = "Շարունակել"
+            cont_surf = self.font_hud.render(cont_text, True, (0, 0, 0))
+            cont_rect = cont_surf.get_rect(center=(SCREEN_WIDTH // 2, 250))
+            pygame.draw.rect(self.screen, (100, 255, 100), cont_rect.inflate(20, 20))
+            self.screen.blit(cont_surf, cont_rect)
+            buttons.append(("continue", cont_rect))
+
+            # Новая игра
+            new_text = "Նոր խաղ"
+            new_surf = self.font_hud.render(new_text, True, (0, 0, 0))
+            new_rect = new_surf.get_rect(center=(SCREEN_WIDTH // 2, 350))
+            pygame.draw.rect(self.screen, (255, 100, 100), new_rect.inflate(20, 20))
+            self.screen.blit(new_surf, new_rect)
+            buttons.append(("new", new_rect))
+
+            pygame.display.flip()
+            self.clock.tick(FPS)
+
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    sys.exit()
+                elif event.type == pygame.MOUSEBUTTONDOWN:
+                    for action, rect in buttons:
+                        if rect.collidepoint(event.pos):
+                            if action == "continue":
+                                self.load_last_world()
+                                running = False
+                            elif action == "new":
+                                if os.path.exists(SAVE_FILE):
+                                    os.remove(SAVE_FILE)
+                                self.world = World_1_1(self)
+                                self.world.start()
+                                running = False
+
+    def load_last_world(self):
+        world_name = load_progress()  # например "World_1_2"
+
+        if not world_name:
+            self.world = World_1_1(self)
+            self.world.start()
+            return
+
+        try:
+            _, w, l = world_name.split("_")
+            world_num = int(w)
+            level_num = int(l)
+
+            worlds_root = "worlds"
+
+            # --- ищем папку мира: world_1_a, world_2_s и т.д. ---
+            world_folder = None
+            for d in os.listdir(worlds_root):
+                if d.startswith(f"world_{world_num}_"):
+                    world_folder = d
+                    break
+
+            if not world_folder:
+                raise Exception("world folder not found")
+
+            # --- ищем файл уровня ---
+            level_file = None
+            for f in os.listdir(os.path.join(worlds_root, world_folder)):
+                if f.startswith(f"world_{world_num}_{level_num}") and f.endswith(".py"):
+                    level_file = f
+                    break
+
+            if not level_file:
+                raise Exception("level file not found")
+
+            module_name = f"worlds.{world_folder}.{level_file[:-3]}"
+            module = importlib.import_module(module_name)
+
+            WorldClass = getattr(module, world_name)
+
+            self.world = WorldClass(self)
+            self.world.start()
+
+        except Exception as e:
+            self.world = World_1_1(self)
+            self.world.start()
 
     def run(self):
+        self.start_screen()  # сначала экран выбора
+
         running = True
         while running:
             for e in pygame.event.get():
@@ -44,11 +143,11 @@ class Game:
                     pygame.display.flip()
                     pygame.time.wait(4000)
                     running = False
-                    continue  # пропускаем отрисовку остального кадра
+                    continue
 
             if self.world.lives <= 0:
                 self.screen.fill((0, 0, 0))
-                lose = self.font_bad.render("GAME OVER 😿", True, (255, 0, 0))
+                lose = self.font_good.render("GAME OVER 😿", True, (255, 0, 0))
                 self.screen.blit(lose, (SCREEN_WIDTH // 2 - 120, SCREEN_HEIGHT // 2))
                 pygame.display.flip()
                 pygame.time.wait(3000)
@@ -56,21 +155,20 @@ class Game:
                 continue
 
             # --- ОЧИСТКА ЭКРАНА ---
-            self.screen.fill((255, 255, 255))  # или можно чёрный фон
+            self.screen.fill((255, 255, 255))
 
             # --- РИСУЕМ МИР ---
-            self.world.draw(self.screen)        # фон + буквы
-            self.world.draw_hud(self.screen)    # HUD
+            self.world.draw(self.screen)
+            self.world.draw_hud(self.screen)
 
             # --- РИСУЕМ КОТА ЧЕРЕЗ КАМЕРУ ---
             cat = self.world.cat
             cam = self.world.camera
-
             screen_x = cat.cat_x - cam.camera_x
             screen_y = cat.cat_y
-
             img = cat.cat_frames[int(cat.cat_index)]
             self.screen.blit(img, img.get_rect(center=(screen_x, screen_y)))
+
             pygame.display.flip()
             self.clock.tick(FPS)
 

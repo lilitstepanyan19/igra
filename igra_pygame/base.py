@@ -3,7 +3,7 @@ import importlib
 import pygame
 from cat import Cat
 from camera import Camera
-
+from save import save_progress
 
 WORLD_WIDTH = 15000
 WORLD_HEIGHT = 600
@@ -19,7 +19,7 @@ LIVES_COUNT = 3
 class WorldBase:
     armenian_letters = "ԱՍԲԳԴԵԶԷԸԹԺԻԼԽԾԿՀՁՂՃՄՅՆՇՈՉՊՋՌՎՏՐՑՈՒՓՔԵՕՖ"
 
-    def __init__(self, game):
+    def __init__(self, game, lives=None):
         self.game = game
         self.score = 0
         self.need = 1
@@ -29,7 +29,7 @@ class WorldBase:
 
         self.person_name = "cat"
 
-        self.lives = LIVES_COUNT
+        self.lives = LIVES_COUNT if lives is None else lives
         self.heart_img = pygame.image.load("images/heart.png").convert_alpha()
         self.heart_img = pygame.transform.scale(self.heart_img, (32, 32))
 
@@ -171,17 +171,59 @@ class WorldBase:
         return self.score >= self.need
 
     def next_world(self):
-        w, l = self.world_num, self.level_num + 1
+        import inspect
+        import importlib
+        import os
 
-        for next_world_num, next_level_num in [(w, l), (w + 1, 1)]:
-            class_name = f"World_{next_world_num}_{next_level_num}"
-            module_name = f"worlds.world_{next_world_num}.world_{next_world_num}_{next_level_num}"
-            try:
+        # --- текущий файл и папка ---
+        file_path = inspect.getfile(self.__class__)
+        folder = os.path.dirname(file_path)
+        file_name = os.path.basename(file_path)
+
+        # world_1_2_rain.py -> 1_2_rain
+        name = file_name.replace("world_", "").replace(".py", "")
+        parts = name.split("_")
+
+        world_num = int(parts[0])
+        level_num = int(parts[1]) + 1
+
+        package = self.__class__.__module__.rsplit(".", 1)[0]
+
+        # ========== 1. ищем следующий уровень в той же папке ==========
+        for f in os.listdir(folder):
+            if f.startswith(f"world_{world_num}_{level_num}"):
+                module_name = f"{package}.{f[:-3]}"
                 module = importlib.import_module(module_name)
-                next_cls = getattr(module, class_name)
-                return next_cls(self.game)
-            except (ModuleNotFoundError, AttributeError):
-                continue
 
-        # следующего уровня или мира нет
+                save_progress(f"World_{world_num}_{level_num}")
+
+                WorldClass = getattr(module, f"World_{world_num}_{level_num}")
+                return WorldClass(self.game, lives=self.lives)
+
+        # ========== 2. ищем следующий мир ==========
+        worlds_root = os.path.dirname(folder)
+
+        next_world_num = world_num + 1
+        next_world_folder = None
+
+        for d in os.listdir(worlds_root):
+            if d.startswith(f"world_{next_world_num}_"):
+                next_world_folder = d
+                break
+
+        if not next_world_folder:
+            return None
+
+        next_folder_path = os.path.join(worlds_root, next_world_folder)
+
+        for f in os.listdir(next_folder_path):
+            if f.startswith(f"world_{next_world_num}_1"):
+                module_name = f"worlds.{next_world_folder}.{f[:-3]}"
+                module = importlib.import_module(module_name)
+
+                save_progress(f"World_{next_world_num}_1")
+                 
+                WorldClass = getattr(module, f"World_{next_world_num}_1")
+                return WorldClass(self.game, lives=self.lives)
+
         return None

@@ -1,23 +1,23 @@
+# worlds/world_1/world_1_1.py
 import pygame
 import random
 from base import WorldBase, WORLD_WIDTH, WORLD_HEIGHT, SCREEN_HEIGHT
 from letter import Letter, LETTER_SPEED  # импортируем новый класс
 
 
-class World_2_3(WorldBase):
+class World_2_2(WorldBase):
 
     def start(self):
-        self.person_name = "squirrelonion" 
+        self.person_name = "squirrel"
         super().start()  # ← создаёт self.cat и self.camera
         self.target = self.armenian_letters[self.world_num - 1]
-        self.letter_count = 20
+        self.letter_count = 7
 
         self.need = 4
         self.score = 0
 
         bg_img = self.load_bg()
 
-        # задний фон
         h = SCREEN_HEIGHT
         scale = SCREEN_HEIGHT / bg_img.get_height()
         w = int(bg_img.get_width() * scale)
@@ -41,7 +41,7 @@ class World_2_3(WorldBase):
             x = random.randint(60, WORLD_WIDTH - 60)
             y = random.randint(140, WORLD_HEIGHT - 60)
             vx = random.choice([-1, 1]) * LETTER_SPEED
-            vy = random.uniform(1.5, 2.5) * LETTER_SPEED
+            vy = random.choice([-1, 1]) * LETTER_SPEED
             self.letters.append(Letter(self.target, x, y, vx, vy, letter_bg))
 
         while target_count < 2 and len(self.letters) < count:
@@ -54,7 +54,7 @@ class World_2_3(WorldBase):
             x = random.randint(60, WORLD_WIDTH - 60)
             y = random.randint(140, WORLD_HEIGHT - 60)
             vx = random.choice([-1, 1])
-            vy = random.uniform(1.5, 2.5) * LETTER_SPEED
+            vy = random.choice([-1, 1])
             self.letters.append(Letter(char, x, y, vx, vy, letter_bg))
 
     def update(self):
@@ -101,6 +101,3 @@ class World_2_3(WorldBase):
                 self.camera.camera_x,
                 self.target,
             )
-
-        self.cat.draw(screen, self.camera.camera_x)
-

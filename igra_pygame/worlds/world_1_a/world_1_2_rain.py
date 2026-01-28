@@ -1,6 +1,6 @@
 import pygame
 import random
-from base import WorldBase, WORLD_WIDTH, WORLD_HEIGHT, SCREEN_HEIGHT
+from base import WorldBase, WORLD_WIDTH, WORLD_HEIGHT, SCREEN_HEIGHT, NEED, SCORE, LETTER_COUNT, ARMENIAN_LETTERS
 from letter import Letter, LETTER_SPEED
 
 
@@ -31,11 +31,11 @@ class World_1_2(WorldBase):
         self.person_name = "cat"
         super().start()  # ← создаёт self.cat и self.camera
 
-        self.target = self.armenian_letters[self.world_num - 1].lower()
+        self.target = ARMENIAN_LETTERS[self.world_num - 1].lower()
         self.hud_target_color = (20, 60, 222)  # синий цвет для цели
-        self.letter_count = 20
-        self.need = 4
-        self.score = 0
+        self.letter_count = LETTER_COUNT
+        self.need = NEED
+        self.score = SCORE
 
         # ===== ФОН =====
         bg_img = self.load_bg()
@@ -96,7 +96,7 @@ class World_1_2(WorldBase):
             char = (
                 self.target
                 if random.random() < 0.6
-                else random.choice(self.armenian_letters)
+                else random.choice(ARMENIAN_LETTERS)
             )
             letter_bg = random.choice(self.letter_bg_imgs)
             x = random.randint(60, WORLD_WIDTH - 60)

@@ -12,12 +12,15 @@ class LettersScreen:
         self.cat = None
         self.camera = None
 
+        self.anim_time = 0
+        self.anim_duration = 60 
+
         self.font_big = pygame.font.Font('fonts/GHEAGpalatBld.otf', 150)
+        self.font_big_handwriting = pygame.font.Font('fonts/Vrdznagir.otf', 150)
         self.font_small = pygame.font.Font('fonts/GHEAGpalatBld.otf', 30)
-        self.font_small_letter = pygame.font.Font("fonts/GHEAGpalatBld.otf", 90)
 
     def start(self):
-        pass
+        self.anim_time = 0
 
     def handle_events(self, events):
         for e in events:
@@ -29,7 +32,8 @@ class LettersScreen:
                         self.game.world.start()
 
     def update(self):
-        pass
+        if self.anim_time < self.anim_duration:
+            self.anim_time += 1
 
     def draw_hud(self, screen):
         pass
@@ -39,7 +43,7 @@ class LettersScreen:
 
     def draw(self, screen):
         screen.fill((93, 173, 226))  # светло-голубой фон
-        next_btn_text = "Հաջորդ տառը սովորելու համար "
+        next_btn_text = "Այս տառը սովորելու համար "
         next_btn_text_2 = " սեղմիր SPACE կամ ENTER "
 
         next_btn = self.font_small.render(next_btn_text, True, (6, 48, 48))
@@ -54,6 +58,10 @@ class LettersScreen:
             (screen.get_width() // 2 - next_btn_2.get_width() // 2, screen.get_height() - next_btn_2.get_height() - 40),
         )
 
+        t = self.anim_time / self.anim_duration
+        scale = 0.3 + 0.7 * t   # от маленькой к нормальной
+        alpha = int(255 * t)
+
         # Расставляем буквы 2x2
         rows = 2
         cols = 2
@@ -62,13 +70,25 @@ class LettersScreen:
 
         start_x = screen.get_width() // 2 - spacing_x
         start_y = screen.get_height() // 2 - spacing_y - 80
-
+        
         for idx, ch in enumerate(self.letters[:4]):
             row = idx % cols
             col = idx // cols
 
-            font = self.font_big 
-            img = font.render(ch, True, (2, 36, 36))
+            if isinstance(ch, pygame.Surface):
+                img = ch
+            else:
+                if row == 0:
+                    font = self.font_big
+                else:
+                    font = self.font_big_handwriting
+
+                img = font.render(ch, True, (2, 36, 36))
+            img = pygame.transform.smoothscale(
+                img,
+                (int(img.get_width() * scale), int(img.get_height() * scale))
+            )
+            img.set_alpha(alpha)
 
             x = start_x + col * spacing_x
             y = start_y + row * spacing_y

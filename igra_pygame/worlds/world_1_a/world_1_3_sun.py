@@ -2,7 +2,7 @@ import pygame
 import random
 import os
 import math
-from base import WorldBase, WORLD_WIDTH, WORLD_HEIGHT, SCREEN_HEIGHT
+from base import WorldBase, WORLD_WIDTH, WORLD_HEIGHT, SCREEN_HEIGHT, NEED, SCORE, LETTER_COUNT, ARMENIAN_LETTERS
 from letter import Letter, LETTER_SPEED  # импортируем новый класс
 
 
@@ -11,11 +11,11 @@ class World_1_3(WorldBase):
     def start(self):
         self.person_name = "cat"
         super().start()  # ← создаёт self.cat и self.camera
-        self.target = self.armenian_letters[self.world_num - 1]
-        self.letter_count = 20
+        self.target = ARMENIAN_LETTERS[self.world_num - 1]
+        self.letter_count = LETTER_COUNT
 
-        self.need = 4
-        self.score = 0
+        self.need = NEED
+        self.score = SCORE
 
         bg_img = self.load_bg()
 
@@ -73,7 +73,7 @@ class World_1_3(WorldBase):
             char = (
                 self.target
                 if random.random() < 0.6
-                else random.choice(self.armenian_letters)
+                else random.choice(ARMENIAN_LETTERS)
             )
             letter_bg = random.choice(self.letter_bg_imgs)
             x = random.randint(60, WORLD_WIDTH - 60)

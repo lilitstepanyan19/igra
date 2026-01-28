@@ -2,11 +2,11 @@ import pygame
 import sys
 import importlib
 import os
-from base import SCREEN_WIDTH, SCREEN_HEIGHT, FPS
+from base import SCREEN_WIDTH, SCREEN_HEIGHT, FPS, ARMENIAN_LETTERS
 from save import load_progress, save_progress, SAVE_FILE
 
-# from worlds.world_1_a.world_1_1 import World_1_1    # стартовый мир
-from letters_screen import LettersScreen  # стартовый мир
+from letters_screen import LettersScreen
+from worlds.world_1_a.world_1_1 import World_1_1  # стартовый мир
 
 class Game:
     def __init__(self):
@@ -67,7 +67,17 @@ class Game:
                             elif action == "new":
                                 if os.path.exists(SAVE_FILE):
                                     os.remove(SAVE_FILE)
-                                self.world = LettersScreen(self, "ABC", None)
+                                    # функция для перехода в первый мир
+                                def start_first_world():
+                                    world = World_1_1(self)
+                                    world.start()
+                                    return world
+
+                                first_letters = [ARMENIAN_LETTERS[0], 
+                                                ARMENIAN_LETTERS[0],
+                                                ARMENIAN_LETTERS[0].lower(), 
+                                                ARMENIAN_LETTERS[0].lower()]  
+                                self.world = LettersScreen(self, first_letters, start_first_world)
                                 self.world.start()
                                 running = False
 
@@ -75,7 +85,17 @@ class Game:
         world_name = load_progress()  # например "World_1_2"
 
         if not world_name:
-            self.world = LettersScreen(self, "ABC", None)
+            def start_first_world():
+                world = World_1_1(self)
+                world.start()
+                return world
+            first_letters = [
+                ARMENIAN_LETTERS[0],
+                ARMENIAN_LETTERS[0],
+                ARMENIAN_LETTERS[0].lower(),
+                ARMENIAN_LETTERS[0].lower(),
+            ]
+            self.world = LettersScreen(self, first_letters, start_first_world)
             self.world.start()
             return
 
@@ -173,7 +193,7 @@ class Game:
 
                 # --- обработка событий ---
             self.world.handle_events(events)
-            
+
             pygame.display.flip()
             self.clock.tick(FPS)
 

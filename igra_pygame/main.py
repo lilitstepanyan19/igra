@@ -5,8 +5,8 @@ import os
 from base import SCREEN_WIDTH, SCREEN_HEIGHT, FPS
 from save import load_progress, save_progress, SAVE_FILE
 
-from worlds.world_1_a.world_1_1 import World_1_1  # стартовый мир
-
+# from worlds.world_1_a.world_1_1 import World_1_1    # стартовый мир
+from letters_screen import LettersScreen  # стартовый мир
 
 class Game:
     def __init__(self):
@@ -67,7 +67,7 @@ class Game:
                             elif action == "new":
                                 if os.path.exists(SAVE_FILE):
                                     os.remove(SAVE_FILE)
-                                self.world = World_1_1(self)
+                                self.world = LettersScreen(self, "ABC", None)
                                 self.world.start()
                                 running = False
 
@@ -75,7 +75,7 @@ class Game:
         world_name = load_progress()  # например "World_1_2"
 
         if not world_name:
-            self.world = World_1_1(self)
+            self.world = LettersScreen(self, "ABC", None)
             self.world.start()
             return
 
@@ -115,7 +115,7 @@ class Game:
             self.world.start()
 
         except Exception as e:
-            self.world = World_1_1(self)
+            self.world = LettersScreen(self, "ABC", None)
             self.world.start()
 
     def run(self):
@@ -123,7 +123,8 @@ class Game:
 
         running = True
         while running:
-            for e in pygame.event.get():
+            events = pygame.event.get()
+            for e in events:
                 if e.type == pygame.QUIT:
                     running = False
 
@@ -162,13 +163,17 @@ class Game:
             self.world.draw_hud(self.screen)
 
             # --- РИСУЕМ КОТА ЧЕРЕЗ КАМЕРУ ---
-            cat = self.world.cat
-            cam = self.world.camera
-            screen_x = cat.cat_x - cam.camera_x
-            screen_y = cat.cat_y
-            img = cat.cat_frames[int(cat.cat_index)]
-            self.screen.blit(img, img.get_rect(center=(screen_x, screen_y)))
+            if self.world.cat and self.world.camera:
+                cat = self.world.cat
+                cam = self.world.camera
+                screen_x = cat.cat_x - cam.camera_x
+                screen_y = cat.cat_y
+                img = cat.cat_frames[int(cat.cat_index)]
+                self.screen.blit(img, img.get_rect(center=(screen_x, screen_y)))
 
+                # --- обработка событий ---
+            self.world.handle_events(events)
+            
             pygame.display.flip()
             self.clock.tick(FPS)
 

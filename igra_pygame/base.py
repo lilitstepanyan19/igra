@@ -1,9 +1,12 @@
 import os
 import importlib
+import inspect
 import pygame
 from cat import Cat
 from camera import Camera
 from save import save_progress
+from letters_screen import LettersScreen
+
 
 WORLD_WIDTH = 15000
 WORLD_HEIGHT = 600
@@ -105,6 +108,10 @@ class WorldBase:
 
     def draw(self, screen):
         pass
+    
+    def handle_events(self, events):
+        # обычные миры пока не обрабатывают события напрямую
+        pass
 
     def draw_hud(self, screen):
         take_text = "Բռնիր "
@@ -171,9 +178,6 @@ class WorldBase:
         return self.score >= self.need
 
     def next_world(self):
-        import inspect
-        import importlib
-        import os
 
         # --- текущий файл и папка ---
         file_path = inspect.getfile(self.__class__)
@@ -215,15 +219,40 @@ class WorldBase:
             return None
 
         next_folder_path = os.path.join(worlds_root, next_world_folder)
+    
+        first_world_class = None
+        first_world_module = None
 
         for f in os.listdir(next_folder_path):
             if f.startswith(f"world_{next_world_num}_1"):
                 module_name = f"worlds.{next_world_folder}.{f[:-3]}"
-                module = importlib.import_module(module_name)
+                first_world_module = importlib.import_module(module_name)
+                first_world_class = getattr(first_world_module, f"World_{next_world_num}_1")
+                break
+            
+        if not first_world_class:
+            return None
 
-                save_progress(f"World_{next_world_num}_1")
-                 
-                WorldClass = getattr(module, f"World_{next_world_num}_1")
-                return WorldClass(self.game, lives=self.lives)
+
+        # --- создаём временный объект чтобы взять target ---
+        tmp_world = first_world_class(self.game, lives=self.lives)
+        tmp_world.start()
+
+        target = tmp_world.target
+        target_lower = tmp_world.target.lower() if tmp_world.target else None
+
+        if target_lower:
+            letters = [target, target_lower]
+        else:
+            letters = [target]
+
+
+        # --- функция перехода в первый уровень следующего мира ---
+        def go_next_world():
+            save_progress(f"World_{next_world_num}_1")
+            return first_world_class(self.game, lives=self.lives)
+
+
+        return LettersScreen(self.game, letters, go_next_world)
 
         return None

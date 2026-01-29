@@ -238,11 +238,9 @@ class WorldBase:
             return None
 
         target = ARMENIAN_LETTERS[next_world_num - 1]
-        target_handwriting = pygame.font.Font("fonts/Vrdznagir.otf", 150).render(target, True, (0, 0, 0))   
-        target_lower = ARMENIAN_LETTERS[next_world_num - 1].lower()
-        target_lower_handwriting = pygame.font.Font("fonts/Vrdznagir.otf", 150).render(target_lower, True, (0, 0, 0))
-        print(target, target_handwriting, str(target_handwriting))
-        letters = [target, target_lower, target_handwriting, target_lower_handwriting]
+        target_lower = target.lower()
+
+        letters = [target, target, target_lower, target_lower]
 
         # --- функция перехода в первый уровень следующего мира ---
         def go_next_world():

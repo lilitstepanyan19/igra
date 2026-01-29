@@ -43,7 +43,7 @@ class LettersScreen:
 
     def draw(self, screen):
         screen.fill((93, 173, 226))  # светло-голубой фон
-        next_btn_text = "Այս տառը սովորելու համար "
+        next_btn_text = f"{self.letters[0]} տառը սովորելու համար "
         next_btn_text_2 = " սեղմիր SPACE կամ ENTER "
 
         next_btn = self.font_small.render(next_btn_text, True, (6, 48, 48))
@@ -69,21 +69,14 @@ class LettersScreen:
         spacing_y = 200
 
         start_x = screen.get_width() // 2 - spacing_x
-        start_y = screen.get_height() // 2 - spacing_y - 80
-        
+        start_y = screen.get_height() // 2 - spacing_y - 30
+
         for idx, ch in enumerate(self.letters[:4]):
             row = idx % cols
             col = idx // cols
 
-            if isinstance(ch, pygame.Surface):
-                img = ch
-            else:
-                if row == 0:
-                    font = self.font_big
-                else:
-                    font = self.font_big_handwriting
-
-                img = font.render(ch, True, (2, 36, 36))
+            font = self.font_big if idx ==0 or idx == 2 else self.font_big_handwriting
+            img = font.render(ch, True, (2,36,36))
             img = pygame.transform.smoothscale(
                 img,
                 (int(img.get_width() * scale), int(img.get_height() * scale))
@@ -91,7 +84,7 @@ class LettersScreen:
             img.set_alpha(alpha)
 
             x = start_x + col * spacing_x
-            y = start_y + row * spacing_y
+            y = start_y + row * spacing_y - img.get_height() + 150
 
             # полупрозрачный фон под буквой
             bg_rect = img.get_rect(topleft=(x, y))

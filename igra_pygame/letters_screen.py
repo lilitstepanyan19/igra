@@ -1,11 +1,14 @@
+import os
 import pygame
 
 
 class LettersScreen:
-    def __init__(self, game, letters, next_world_func, lives=None):
+
+    def __init__(self, game, letters, world_num, next_world_func, lives=None):
         self.game = game
         self.letters = letters
         self.next_world_func = next_world_func
+        self.world_num = world_num
 
         self.lives = lives if lives is not None else 1
 
@@ -17,7 +20,13 @@ class LettersScreen:
         self.per_letter_time = 80  # сколько кадров на появление одной буквы
         self.img_anim_duration = 40  # сколько кадров на появление картинки
 
-        self.side_img = pygame.image.load("images/world_1/letters_screen/sun_1.png").convert_alpha()
+        folder = f"images/world_{self.world_num}/letters_screen"
+        self.side_img = None
+        if os.path.exists(folder):
+            files = [f for f in os.listdir(folder) if f.lower().endswith(".png")]
+            if files:
+                path = os.path.join(folder, files[0])
+                self.side_img = pygame.image.load(path).convert_alpha()
 
         self.font_big = pygame.font.Font('fonts/GHEAGpalatBld.otf', 150)
         self.font_big_handwriting = pygame.font.Font('fonts/Vrdznagir.otf', 150)
@@ -111,7 +120,7 @@ class LettersScreen:
 
         # --- Анимация картинки справа ---
         total_letters_time = self.per_letter_time * len(self.letters)
-        if self.anim_time >= total_letters_time:
+        if self.side_img and self.anim_time >= total_letters_time:
             # картинка появляется после букв
             t_img = min(1, self.img_anim_time / self.img_anim_duration)
             img_alpha = int(255 * t_img)

@@ -77,7 +77,7 @@ class Game:
                                                 ARMENIAN_LETTERS[0],
                                                 ARMENIAN_LETTERS[0].lower(), 
                                                 ARMENIAN_LETTERS[0].lower()]  
-                                self.world = LettersScreen(self, first_letters, start_first_world)
+                                self.world = LettersScreen(self, first_letters, 1, start_first_world)
                                 self.world.start()
                                 running = False
 
@@ -95,7 +95,7 @@ class Game:
                 ARMENIAN_LETTERS[0].lower(),
                 ARMENIAN_LETTERS[0].lower(),
             ]
-            self.world = LettersScreen(self, first_letters, start_first_world)
+            self.world = LettersScreen(self, first_letters, world_num, start_first_world)
             self.world.start()
             return
 

@@ -2,6 +2,8 @@ import os
 import importlib
 import inspect
 import pygame
+import pygame.mixer
+
 from cat import Cat
 from camera import Camera
 from save import save_progress
@@ -24,6 +26,9 @@ LETTER_COUNT = 20
 
 ARMENIAN_LETTERS = "ԱՍԲԳԴԵԶԷԸԹԺԻԼԽԾԿՀՁՂՃՄՅՆՇՈՉՊՋՌՎՏՐՑՈՒՓՔԵՕՖ"
 
+pygame.mixer.init()
+level_up_sound = pygame.mixer.Sound("sounds/level_up.wav")
+
 class WorldBase:
 
     def __init__(self, game, lives=None):
@@ -39,6 +44,11 @@ class WorldBase:
         self.lives = LIVES_COUNT if lives is None else lives
         self.heart_img = pygame.image.load("images/heart.png").convert_alpha()
         self.heart_img = pygame.transform.scale(self.heart_img, (32, 32))
+
+        self.transitioning = False
+        self.transition_start_time = 0
+        self.transition_duration = 4000  # мс, длительность перехода уровня
+        self.next_level_class = None  # класс следующего уровня
 
         self.hit_cooldown = 1000   # мс (1 секунда)
         self.last_hit_time = 0
@@ -104,11 +114,33 @@ class WorldBase:
         self.letter_bg_imgs = imgs
         return imgs
 
+    def start_level_transition(self, next_level_class):
+        self.cat.cat_index = 0  # кот стоит
+        self.transitioning = True
+        self.transition_start_time = pygame.time.get_ticks()
+        self.next_level_class = next_level_class
+        level_up_sound.play()
+
     def update(self):
-        if not self.cat or not self.camera:
-            return
-        self.cat.update(self.camera.camera_x)
-        self.camera.update(self.cat.cat_x)
+        # фон и буквы всегда обновляются
+        if self.camera:
+            self.camera.update(self.cat.cat_x if self.cat else 0)
+
+        # кот обновляется только если нет перехода
+        if self.cat and not self.transitioning:
+            self.cat.update(self.camera.camera_x)
+
+        # проверка окончания перехода
+        if self.transitioning:
+            now = pygame.time.get_ticks()
+            if now - self.transition_start_time >= self.transition_duration:
+                # пауза закончилась, создаём новый уровень
+                self.transitioning = False
+                if hasattr(self, 'next_level_class') and self.next_level_class:
+                    # сохраняем жизнь, создаём новый уровень
+                    new_world = self.next_level_class(self.game, lives=self.lives)
+                    new_world.start()
+                    self.game.world = new_world
 
     def draw(self, screen):
         pass
@@ -203,9 +235,13 @@ class WorldBase:
                 module_name = f"{package}.{f[:-3]}"
                 module = importlib.import_module(module_name)
 
+                WorldClass = getattr(module, f"World_{world_num}_{level_num}")
+
+                # --- ЗВУК восторга ---
+                self.start_level_transition(WorldClass)
+
                 save_progress(f"World_{world_num}_{level_num}")
 
-                WorldClass = getattr(module, f"World_{world_num}_{level_num}")
                 return WorldClass(self.game, lives=self.lives)
 
         # ========== 2. ищем следующий мир ==========
@@ -247,6 +283,6 @@ class WorldBase:
             save_progress(f"World_{next_world_num}_1")
             return first_world_class(self.game, lives=self.lives)
 
-        return LettersScreen(self.game, letters, go_next_world)
+        return LettersScreen(self.game, letters, next_world_num, go_next_world)
 
         return None

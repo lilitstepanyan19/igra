@@ -28,9 +28,9 @@ class LettersScreen:
                 path = os.path.join(folder, files[0])
                 self.side_img = pygame.image.load(path).convert_alpha()
 
-        self.font_big = pygame.font.Font('fonts/GHEAGpalatBld.otf', 150)
-        self.font_big_handwriting = pygame.font.Font('fonts/Vrdznagir.otf', 150)
-        self.font_small = pygame.font.Font('fonts/GHEAGpalatBld.otf', 30)
+        self.font_big = self.game.font_big
+        self.font_big_handwriting = self.game.font_big_handwriting
+        self.font_small = self.game.font_small
 
     def start(self):
         self.anim_time = 0

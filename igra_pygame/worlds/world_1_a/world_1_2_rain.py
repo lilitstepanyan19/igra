@@ -4,7 +4,6 @@ from base import WorldBase, WORLD_WIDTH, WORLD_HEIGHT, SCREEN_HEIGHT, NEED, SCOR
 from letter import Letter, LETTER_SPEED
 
 
-
 class RainDrop:
     def __init__(self, x, y, speed, img):
         self.x = x
@@ -119,12 +118,14 @@ class World_1_2(WorldBase):
             if letter.check_collision(cat_rect):
                 if letter.char == self.target:
                     self.score += 1
-                    self.letters.remove(letter)
+                    self.eat_sound.play()
                 else:
                     now = pygame.time.get_ticks()
                     if now - self.last_hit_time > self.hit_cooldown:
                         self.lives -= 1
                         self.last_hit_time = now
+                        self.eat_bad_sound.play()
+                self.letters.remove(letter)
 
         # появление букв
         now = pygame.time.get_ticks()

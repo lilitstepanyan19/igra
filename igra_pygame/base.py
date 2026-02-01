@@ -26,12 +26,10 @@ LETTER_COUNT = 20
 
 ARMENIAN_LETTERS = "ԱՍԲԳԴԵԶԷԸԹԺԻԼԽԾԿՀՁՂՃՄՅՆՇՈՉՊՋՌՎՏՐՑՈՒՓՔԵՕՖ"
 
-pygame.mixer.init()
-level_up_sound = pygame.mixer.Sound("sounds/level_up.wav")
 
 class WorldBase:
-
     def __init__(self, game, lives=None):
+        pygame.mixer.init()
         self.game = game
         self.score = 0
         self.need = 1
@@ -41,13 +39,17 @@ class WorldBase:
 
         self.person_name = "cat"
 
+        self.eat_sound = pygame.mixer.Sound("sounds/eat.wav")
+        self.eat_bad_sound = pygame.mixer.Sound("sounds/eat.wav")
+        self.level_up_sound = pygame.mixer.Sound("sounds/level_up.wav")
+
         self.lives = LIVES_COUNT if lives is None else lives
         self.heart_img = pygame.image.load("images/heart.png").convert_alpha()
         self.heart_img = pygame.transform.scale(self.heart_img, (32, 32))
 
         self.transitioning = False
         self.transition_start_time = 0
-        self.transition_duration = 4000  # мс, длительность перехода уровня
+        self.transition_duration = 1000  # мс, длительность перехода уровня
         self.next_level_class = None  # класс следующего уровня
 
         self.hit_cooldown = 1000   # мс (1 секунда)
@@ -115,29 +117,36 @@ class WorldBase:
         return imgs
 
     def start_level_transition(self, next_level_class):
-        self.cat.cat_index = 0  # кот стоит
+
         self.transitioning = True
         self.transition_start_time = pygame.time.get_ticks()
         self.next_level_class = next_level_class
-        level_up_sound.play()
+        self.level_up_sound.play()
 
     def update(self):
-        # фон и буквы всегда обновляются
+        # Камера обновляется всегда
         if self.camera:
             self.camera.update(self.cat.cat_x if self.cat else 0)
 
-        # кот обновляется только если нет перехода
-        if self.cat and not self.transitioning:
-            self.cat.update(self.camera.camera_x)
+        # Кот:
+        if self.cat:
+            if self.transitioning:
+                # ❄️ кот стоит на земле, заморожен
+                self.cat.cat_vy = 0
+                self.cat.cat_y = self.cat.GROUND_Y
+                self.cat.on_ground = True
+                self.cat.cat_index = 0
+            else:
+                self.cat.update(self.camera.camera_x)
 
-        # проверка окончания перехода
+        # Переход на следующий уровень
         if self.transitioning:
             now = pygame.time.get_ticks()
             if now - self.transition_start_time >= self.transition_duration:
-                # пауза закончилась, создаём новый уровень
                 self.transitioning = False
+
                 if hasattr(self, 'next_level_class') and self.next_level_class:
-                    # сохраняем жизнь, создаём новый уровень
+                    # создаём новый уровень только сейчас
                     new_world = self.next_level_class(self.game, lives=self.lives)
                     new_world.start()
                     self.game.world = new_world
@@ -146,8 +155,8 @@ class WorldBase:
         pass
 
     def handle_events(self, events):
-        # обычные миры пока не обрабатывают события напрямую
-        pass
+        if self.transitioning:
+            return  # ❄️ кот полностью заморожен
 
     def draw_hud(self, screen):
         take_text = "Բռնիր "
@@ -242,7 +251,7 @@ class WorldBase:
 
                 save_progress(f"World_{world_num}_{level_num}")
 
-                return WorldClass(self.game, lives=self.lives)
+                return self
 
         # ========== 2. ищем следующий мир ==========
         worlds_root = os.path.dirname(folder)

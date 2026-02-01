@@ -11,6 +11,7 @@ from worlds.world_1_a.world_1_1 import World_1_1  # стартовый мир
 class Game:
     def __init__(self):
         pygame.init()
+        pygame.mixer.init()
         self.screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
         pygame.display.set_caption("Cat Catch Letters 😺")
         self.clock = pygame.time.Clock()
@@ -18,6 +19,14 @@ class Game:
         self.font_good = pygame.font.Font("fonts/GHEAGpalatBld.otf", 48)
         self.font_bad = pygame.font.Font("fonts/GHEAGpalatBld.otf", 36)
         self.font_hud = pygame.font.Font("fonts/GHEAGpalatBld.otf", 24)
+
+        self.font_big = pygame.font.Font('fonts/GHEAGpalatBld.otf', 150)
+        self.font_big_handwriting = pygame.font.Font('fonts/Vrdznagir.otf', 150)
+        self.font_small = pygame.font.Font('fonts/GHEAGpalatBld.otf', 30)
+
+        #-- Sounds ---
+        self.game_over_sound = pygame.mixer.Sound("sounds/game_over.wav")
+        self.you_win_sound = pygame.mixer.Sound("sounds/game_over.wav")
 
         self.world = None
 
@@ -158,6 +167,7 @@ class Game:
                     self.world = nxt
                     self.world.start()
                 else:
+                    self.you_win_sound.play()  # ← звук победы
                     self.screen.fill((0, 0, 0))
                     win = self.font_good.render("YOU WIN 😺🎉", True, (255, 255, 255))
                     self.screen.blit(win, (SCREEN_WIDTH // 2 - 120, SCREEN_HEIGHT // 2))
@@ -167,6 +177,7 @@ class Game:
                     continue
 
             if self.world.lives <= 0:
+                self.game_over_sound.play()  # ← звук проигрыша
                 self.screen.fill((0, 0, 0))
                 lose = self.font_good.render("GAME OVER 😿", True, (255, 0, 0))
                 self.screen.blit(lose, (SCREEN_WIDTH // 2 - 120, SCREEN_HEIGHT // 2))

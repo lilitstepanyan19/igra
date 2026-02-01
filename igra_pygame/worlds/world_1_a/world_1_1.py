@@ -65,12 +65,14 @@ class World_1_1(WorldBase):
             if letter.check_collision(cat_rect):
                 if letter.char == self.target:
                     self.score += 1
-                    self.letters.remove(letter)
+                    self.eat_sound.play()
                 else:
                     now = pygame.time.get_ticks()
                     if now - self.last_hit_time > self.hit_cooldown:
                         self.lives -= 1
                         self.last_hit_time = now
+                        self.eat_bad_sound.play()
+                self.letters.remove(letter)
 
         now = pygame.time.get_ticks()
 

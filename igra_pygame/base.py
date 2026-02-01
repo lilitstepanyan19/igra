@@ -24,7 +24,7 @@ NEED = 4
 SCORE = 0
 LETTER_COUNT = 20
 
-ARMENIAN_LETTERS = "ԱՍԲԳԴԵԶԷԸԹԺԻԼԽԾԿՀՁՂՃՄՅՆՇՈՉՊՋՌՎՏՐՑՈՒՓՔԵՕՖ"
+ARMENIAN_LETTERS = "ԱՍՇԲԳԴԵԶԷԸԹԺԻԼԽԾԿՀՁՂՃՄՅՆՈՉՊՋՌՎՏՐՑՈՒՓՔԵՕՖ"
 
 
 class WorldBase:

@@ -72,7 +72,12 @@ class WorldBase:
             self.world_num,
             self.level_num,
             self.person_name,
+            cat_scale=getattr(self, "cat_scale", 1.0),  # ✅ ВАЖНО
+            cat_width=getattr(self, "cat_width", 120),
+            cat_height=getattr(self, "cat_height", 120)
         )
+        self.cat.JUMP_POWER = getattr(self, "JUMP_POWER", -20)
+
         self.camera = Camera(WIDTH, WORLD_WIDTH)
 
     def load_bg(self, bg_img_num=1):

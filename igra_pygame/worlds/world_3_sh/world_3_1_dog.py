@@ -110,8 +110,4 @@ class World_3_1(WorldBase):
                 self.target,
             )
 
-        self.cat.draw(screen, self.camera.camera_x)
-
-        # --- передний фон (поверх персонажа) ---
-        for x in range(0, WORLD_WIDTH, self.bg_front_w):
-            screen.blit(self.bg_front, (x - self.camera.camera_x, 0))
+       

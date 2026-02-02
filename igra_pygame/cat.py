@@ -16,11 +16,20 @@ class Cat:
         world_num,
         level_num,
         person_name="cat",  # новый аргумент
+        cat_scale=1.0,
+        cat_width=120,
+        cat_height=120,
+        cat_default_height=120,
     ):
         self.screen_width = screen_width
         self.screen_height = screen_height
         self.world_width = world_width
         self.world_height = world_height
+
+        self.cat_scale = cat_scale
+        self.cat_width = cat_width
+        self.cat_height = cat_height
+        self.cat_default_height = cat_default_height
 
         # --- load cat frames ---
         self.cat_right = self.load_cat("right", world_num, level_num, person_name)
@@ -37,8 +46,7 @@ class Cat:
         self.JUMP_POWER = -20
         self.on_ground = False
 
-        self.GROUND_Y = self.world_height - 120  # уровень земли
-
+        self.GROUND_Y = self.world_height - int(self.cat_default_height)
     def load_cat(self, direction, world_num, level_num, person_name="cat"):
         frames = []
         folder = f"images/world_{world_num}/world_{world_num}_{level_num}/person"
@@ -52,7 +60,9 @@ class Cat:
                 path = os.path.join(folder, name)
                 try:
                     img = pygame.image.load(path).convert_alpha()
-                    img = pygame.transform.scale(img, (120, 120))
+                    size_width = int(self.cat_width * self.cat_scale)
+                    size_height = int(self.cat_height * self.cat_scale)
+                    img = pygame.transform.scale(img, (size_width, size_height))
                     frames.append(img)
                 except pygame.error as e:
                     print(f"Не удалось загрузить {path}: {e}")

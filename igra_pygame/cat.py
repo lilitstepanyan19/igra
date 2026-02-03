@@ -20,6 +20,7 @@ class Cat:
         cat_width=120,
         cat_height=120,
         cat_default_height=120,
+        cat_y_offset=0,
     ):
         self.screen_width = screen_width
         self.screen_height = screen_height
@@ -30,6 +31,7 @@ class Cat:
         self.cat_width = cat_width
         self.cat_height = cat_height
         self.cat_default_height = cat_default_height
+        self.cat_y_offset = cat_y_offset
 
         # --- load cat frames ---
         self.cat_right = self.load_cat("right", world_num, level_num, person_name)
@@ -46,7 +48,7 @@ class Cat:
         self.JUMP_POWER = -20
         self.on_ground = False
 
-        self.GROUND_Y = self.world_height - int(self.cat_default_height)
+        self.GROUND_Y = self.world_height - int(self.cat_default_height) - self.cat_y_offset
     def load_cat(self, direction, world_num, level_num, person_name="cat"):
         frames = []
         folder = f"images/world_{world_num}/world_{world_num}_{level_num}/person"

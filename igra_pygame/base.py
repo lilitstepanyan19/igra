@@ -24,7 +24,8 @@ NEED = 4
 SCORE = 0
 LETTER_COUNT = 20
 
-ARMENIAN_LETTERS = "ԱՍՇԲԳԴԵԶԷԸԹԺԻԼԽԾԿՀՁՂՃՄՅՆՈՉՊՋՌՎՏՐՑՈՒՓՔԵՕՖ"
+# "ԲԳԴԵԶԷԸԹԺԻԼԽԾԿՀՂՃՄՅՆՈՉՊՋՌՎՏՐՑՈՒՓՔԵՕՖ"
+ARMENIAN_LETTERS = "ԱՍՇՁԲԳԴԵԶԷԸԹԺԻԼԽԾԿՀՂՃՄՅՆՈՉՊՋՌՎՏՐՑՈՒՓՔԵՕՖ"
 
 
 class WorldBase:
@@ -74,7 +75,8 @@ class WorldBase:
             self.person_name,
             cat_scale=getattr(self, "cat_scale", 1.0),  # ✅ ВАЖНО
             cat_width=getattr(self, "cat_width", 120),
-            cat_height=getattr(self, "cat_height", 120)
+            cat_height=getattr(self, "cat_height", 120),
+            cat_y_offset=getattr(self, "cat_y_offset", 0),
         )
         self.cat.JUMP_POWER = getattr(self, "JUMP_POWER", -20)
 

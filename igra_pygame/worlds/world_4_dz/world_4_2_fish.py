@@ -28,6 +28,8 @@ class RainDrop:
 class World_4_2(WorldBase):
     def start(self):
         self.person_name = "fish"
+        self.JUMP_POWER = -15
+        self.cat_y_offset = 40
         super().start()  # ← создаёт self.cat и self.camera
 
         self.target = ARMENIAN_LETTERS[self.world_num - 1].lower()
@@ -48,8 +50,8 @@ class World_4_2(WorldBase):
         self.letters = []
         self.load_letter_bgs(self.world_num, self.level_num)
 
-        # ===== ДОЖДЬ =====
-        drop_img = pygame.image.load("images/world_1/world_1_2/rain/rain_1.png").convert_alpha()
+        # ===== Fish =====
+        drop_img = pygame.image.load("images/world_4/world_4_2_fish/fish/fish_1.png").convert_alpha()
         drop_img = pygame.transform.scale(drop_img, (4, 60))  # ширина/высота капли
 
         # задний слой
@@ -60,7 +62,7 @@ class World_4_2(WorldBase):
                 random.uniform(2, 3),
                 drop_img,
             )
-            for _ in range(1500)
+            for _ in range(500)
         ]
 
         # передний слой
@@ -71,7 +73,7 @@ class World_4_2(WorldBase):
                 random.uniform(4, 5),
                 drop_img,
             )
-            for _ in range(1000)
+            for _ in range(250)
         ]
 
         # ===== ВРЕМЯ ДЛЯ ПОЯВЛЕНИЯ БУКВ =====

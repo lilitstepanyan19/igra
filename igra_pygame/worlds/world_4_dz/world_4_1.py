@@ -9,7 +9,7 @@ class World_4_1(WorldBase):
     def start(self):
         self.person_name = "fish"
         self.JUMP_POWER = -15
-        self.cat_y_offset = 40
+        self.cat_y_offset = 120
         super().start()  # ← создаёт self.cat и self.camera
         self.target = ARMENIAN_LETTERS[self.world_num - 1]
         self.letter_count = LETTER_COUNT

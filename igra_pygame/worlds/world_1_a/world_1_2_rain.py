@@ -31,10 +31,12 @@ class World_1_2(WorldBase):
         super().start()  # ← создаёт self.cat и self.camera
 
         self.target = ARMENIAN_LETTERS[self.world_num - 1].lower()
-        self.hud_target_color = (20, 60, 222)  # синий цвет для цели
         self.letter_count = LETTER_COUNT
         self.need = NEED
         self.score = SCORE
+
+        self.good_target_color = (20, 60, 222)  # синий цвет для цели
+        self.bad_target_color = (41, 42, 74)
 
         # ===== ФОН =====
         bg_img = self.load_bg()
@@ -157,10 +159,10 @@ class World_1_2(WorldBase):
 
             # другие цвета ТОЛЬКО для этого мира
             if letter.char == self.target:
-                color = self.hud_target_color 
+                color = self.good_target_color 
                 font = self.game.font_good
             else:
-                color = (41, 42, 74)  # тёмно-синий
+                color = self.bad_target_color  # тёмно-синий
                 font = self.game.font_bad
 
             text = font.render(letter.char, True, color)

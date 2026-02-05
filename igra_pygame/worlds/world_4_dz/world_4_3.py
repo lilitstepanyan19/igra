@@ -9,15 +9,19 @@ from letter import Letter, LETTER_SPEED  # импортируем новый к�
 class World_4_3(WorldBase):
 
     def start(self):
-        self.person_name = "fish"
-        self.JUMP_POWER = -15
-        self.cat_y_offset = 120
+        self.person_name = "horse"
+        self.cat_scale = 1.5
+        self.cat_width = 150
+        self.cat_y_offset = 90
+
         super().start()  # ← создаёт self.cat и self.camera
         self.target = ARMENIAN_LETTERS[self.world_num - 1]
         self.letter_count = LETTER_COUNT
-
         self.need = NEED
         self.score = SCORE
+
+        self.good_target_color = (78,18, 1)
+        self.bad_target_color = (26, 7, 0)
 
         bg_img = self.load_bg()
 
@@ -149,10 +153,22 @@ class World_4_3(WorldBase):
 
         # буквы
         for letter in self.letters:
-            letter.draw(
-                screen,
-                self.game.font_good,
-                self.game.font_bad,
-                self.camera.camera_x,
-                self.target,
-            )
+            x = letter.x - self.camera.camera_x
+            y = letter.y
+
+            # фон под буквой
+            if letter.bg_img:
+                rect = letter.bg_img.get_rect(center=(x, y))
+                screen.blit(letter.bg_img, rect)
+
+            # другие цвета ТОЛЬКО для этого мира
+            if letter.char == self.target:
+                color = self.good_target_color
+                font = self.game.font_good
+            else:
+                color = self.bad_target_color  # тёмно-синий
+                font = self.game.font_bad
+
+            text = font.render(letter.char, True, color)
+            text_rect = text.get_rect(center=(x, y))
+            screen.blit(text, text_rect)

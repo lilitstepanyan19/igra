@@ -24,7 +24,7 @@ NEED = 4
 SCORE = 0
 LETTER_COUNT = 20
 
-# "ԲԳԴԵԶԷԸԹԺԻԼԽԾԿՀՂՃՄՅՆՈՉՊՋՌՎՏՐՑՈՒՓՔԵՕՖ"
+# "ԳԴԵԶԷԸԹԺԻԼԽԾԿՀՂՃՄՅՆՈՉՊՋՌՎՏՐՑՈՒՓՔԵՕՖ"
 ARMENIAN_LETTERS = "ԱՍՇՁԲԳԴԵԶԷԸԹԺԻԼԽԾԿՀՂՃՄՅՆՈՉՊՋՌՎՏՐՑՈՒՓՔԵՕՖ"
 
 
@@ -78,6 +78,7 @@ class WorldBase:
             cat_height=getattr(self, "cat_height", 120),
             cat_y_offset=getattr(self, "cat_y_offset", 0),
         )
+        self.cat.GRAVITY = getattr(self, "GRAVITY", 0.6)
         self.cat.JUMP_POWER = getattr(self, "JUMP_POWER", -20)
 
         self.camera = Camera(WIDTH, WORLD_WIDTH)
@@ -185,7 +186,7 @@ class WorldBase:
             screen.blit(bg_img, bg_rect)
 
             # текст поверх фона
-            color = getattr(self, "hud_target_color", (0, 180, 0))  # если нет — зелёный
+            color = getattr(self, "good_target_color", (0, 180, 0))  # если нет — зелёный
             target_surf = self.game.font_good.render(self.target, True, color)
             target_rect = target_surf.get_rect(center=bg_rect.center)
             screen.blit(target_surf, target_rect)

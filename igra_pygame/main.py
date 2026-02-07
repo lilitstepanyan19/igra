@@ -7,7 +7,7 @@ from save import load_progress, save_progress, SAVE_FILE
 
 from letters_screen import LettersScreen
 # from worlds.world_1_a.world_1_1 import World_1_1  # стартовый мир
-from worlds.world_4_dz.world_4_1 import World_4_1
+from worlds.world_5_b.world_5_1_owl import World_5_1
 
 class Game:
     def __init__(self):
@@ -79,7 +79,7 @@ class Game:
                                     os.remove(SAVE_FILE)
                                     # функция для перехода в первый мир
                                 def start_first_world():
-                                    world = World_4_1(self)
+                                    world = World_5_1(self)
                                     world.start()
                                     return world
 
@@ -96,7 +96,7 @@ class Game:
 
         if not world_name:
             def start_first_world():
-                world = World_4_1(self)
+                world = World_5_1(self)
                 world.start()
                 return world
             first_letters = [

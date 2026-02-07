@@ -4,10 +4,14 @@ from base import WorldBase, WORLD_WIDTH, WORLD_HEIGHT, SCREEN_HEIGHT,NEED, SCORE
 from letter import Letter, LETTER_SPEED  # импортируем новый класс
 
 
-class World_5_1(WorldBase):
+class World_5_2(WorldBase):
 
     def start(self):
-        self.person_name = "owl"
+        self.person_name = "duck"
+        self.cat_scale = 1.2
+        self.cat_y_offset = -10
+        self.JUMP_POWER = -10
+        self.cat_width = 180
 
         super().start()  # ← создаёт self.cat и self.camera
         self.target = ARMENIAN_LETTERS[self.world_num - 1]
@@ -15,6 +19,9 @@ class World_5_1(WorldBase):
 
         self.need = NEED
         self.score = SCORE
+
+        self.good_target_color = (18, 97, 29)
+        self.bad_target_color = (3, 151, 69)
 
         bg_img = self.load_bg()
 
@@ -95,11 +102,24 @@ class World_5_1(WorldBase):
             screen.blit(self.bg, (x - self.camera.camera_x, 0))
 
         # буквы
+        # буквы
         for letter in self.letters:
-            letter.draw(
-                screen,
-                self.game.font_good,
-                self.game.font_bad,
-                self.camera.camera_x,
-                self.target,
-            )
+            x = letter.x - self.camera.camera_x
+            y = letter.y
+
+            # фон под буквой
+            if letter.bg_img:
+                rect = letter.bg_img.get_rect(center=(x, y))
+                screen.blit(letter.bg_img, rect)
+
+            # другие цвета ТОЛЬКО для этого мира
+            if letter.char == self.target:
+                color = self.good_target_color
+                font = self.game.font_good
+            else:
+                color = self.bad_target_color  # тёмно-синий
+                font = self.game.font_bad
+
+            text = font.render(letter.char, True, color)
+            text_rect = text.get_rect(center=(x, y))
+            screen.blit(text, text_rect)

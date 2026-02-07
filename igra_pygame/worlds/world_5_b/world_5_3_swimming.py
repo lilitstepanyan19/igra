@@ -9,10 +9,10 @@ from letter import Letter, LETTER_SPEED  # импортируем новый к�
 class World_5_3(WorldBase):
 
     def start(self):
-        self.person_name = "horse"
-        self.cat_scale = 1.5
-        self.cat_width = 150
-        self.cat_y_offset = 90
+        self.person_name = "duck_swimming"
+        self.cat_width = 170
+        self.JUMP_POWER = 0
+        self.cat_y_offset = -10
 
         super().start()  # ← создаёт self.cat и self.camera
         self.target = ARMENIAN_LETTERS[self.world_num - 1]
@@ -20,8 +20,8 @@ class World_5_3(WorldBase):
         self.need = NEED
         self.score = SCORE
 
-        self.good_target_color = (78,18, 1)
-        self.bad_target_color = (26, 7, 0)
+        self.good_target_color = (133, 242, 54)
+        self.bad_target_color = (248, 51, 97)
 
         bg_img = self.load_bg()
 

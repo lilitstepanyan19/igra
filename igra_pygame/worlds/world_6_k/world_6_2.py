@@ -6,12 +6,12 @@ from base import WorldBase, WORLD_WIDTH, WORLD_HEIGHT, SCREEN_HEIGHT, NEED, SCOR
 from letter import Letter, LETTER_SPEED  # импортируем новый класс
 
 
-class World_5_3(WorldBase):
+class World_6_2(WorldBase):
 
     def start(self):
-        self.person_name = "duck_swimming"
+        self.person_name = "kangaroo"
         self.cat_width = 170
-        self.JUMP_POWER = -10
+
         self.cat_y_offset = -10
 
         super().start()  # ← создаёт self.cat и self.camera
@@ -19,6 +19,7 @@ class World_5_3(WorldBase):
         self.letter_count = LETTER_COUNT
         self.need = NEED
         self.score = SCORE
+        self.cat.enable_walk_bounce = True
 
         self.good_target_color = (133, 242, 54)
         self.bad_target_color = (248, 51, 97)
@@ -172,3 +173,13 @@ class World_5_3(WorldBase):
             text = font.render(letter.char, True, color)
             text_rect = text.get_rect(center=(x, y))
             screen.blit(text, text_rect)
+
+        # буквы
+        # for letter in self.letters:
+        #     letter.draw(
+        #         screen,
+        #         self.game.font_good,
+        #         self.game.font_bad,
+        #         self.camera.camera_x,
+        #         self.target,
+        #     )

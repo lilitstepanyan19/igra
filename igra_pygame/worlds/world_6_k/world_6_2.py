@@ -11,18 +11,19 @@ class World_6_2(WorldBase):
     def start(self):
         self.person_name = "kangaroo"
         self.cat_width = 170
-
         self.cat_y_offset = -10
+        self.JUMP_POWER = -30
+        self.cat_anim_speed = 0.1
+        self.cat_kangaroo_jump_amplitude = 30
 
         super().start()  # ← создаёт self.cat и self.camera
         self.target = ARMENIAN_LETTERS[self.world_num - 1]
         self.letter_count = LETTER_COUNT
         self.need = NEED
         self.score = SCORE
-        self.cat.enable_walk_bounce = True
 
-        self.good_target_color = (133, 242, 54)
-        self.bad_target_color = (248, 51, 97)
+        self.good_target_color = (20, 38, 58)
+        self.bad_target_color = (167, 16, 0)
 
         bg_img = self.load_bg()
 

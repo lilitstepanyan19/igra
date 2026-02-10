@@ -24,7 +24,7 @@ NEED = 4
 SCORE = 0
 LETTER_COUNT = 20
 
-                       # "ԳԴԵԶԷԸԹԺԻԼԽԾՀՂՃՄՅՆՈՉՊՋՌՎՏՐՑՈՒՓՔԵՕՖ"
+# "ԳԴԵԶԷԸԹԺԻԼԽԾՀՂՃՄՅՆՈՉՊՋՌՎՏՐՑՈՒՓՔԵՕՖ"
 ARMENIAN_LETTERS = "ԱՍՇՁԲԿԳԴԵԶԷԸԹԺԻԼԽԾՀՂՃՄՅՆՈՉՊՋՌՎՏՐՑՈՒՓՔԵՕՖ"
 
 
@@ -48,11 +48,11 @@ class WorldBase:
         self.heart_img = pygame.image.load("images/heart.png").convert_alpha()
         self.heart_img = pygame.transform.scale(self.heart_img, (32, 32))
 
-        self.transitioning = False
-        self.transition_start_time = 0
-        self.transition_duration = 1000  # мс, длительность перехода уровня
-        self.next_level_class = None  # класс следующего уровня
-
+        self.finish_time = None        # момент завершения уровня
+        self.next_level_class = None   # класс следующего уровня
+        self.game_completed = False
+        self.level_wait_time = 3000
+        
         self.hit_cooldown = 1000   # мс (1 секунда)
         self.last_hit_time = 0
 
@@ -80,6 +80,9 @@ class WorldBase:
         )
         self.cat.GRAVITY = getattr(self, "GRAVITY", 0.6)
         self.cat.JUMP_POWER = getattr(self, "JUMP_POWER", -20)
+        self.cat.cat_anim_speed = getattr(self, 'cat_anim_speed', 0.15)
+        self.cat.cat_kangaroo_jump_amplitude = getattr(self, "cat_kangaroo_jump_amplitude", 20)
+        self.cat.cat_kangaroo_jump_speed = getattr(self, "cat_kangaroo_jump_speed", 0.1)
 
         self.camera = Camera(WIDTH, WORLD_WIDTH)
 
@@ -124,47 +127,33 @@ class WorldBase:
         self.letter_bg_imgs = imgs
         return imgs
 
-    def start_level_transition(self, next_level_class):
-
-        self.transitioning = True
-        self.transition_start_time = pygame.time.get_ticks()
-        self.next_level_class = next_level_class
-        self.level_up_sound.play()
-
     def update(self):
-        # Камера обновляется всегда
         if self.camera:
             self.camera.update(self.cat.cat_x if self.cat else 0)
 
-        # Кот:
         if self.cat:
-            if self.transitioning:
-                # ❄️ кот стоит на земле, заморожен
-                self.cat.cat_vy = 0
-                self.cat.cat_y = self.cat.GROUND_Y
-                self.cat.on_ground = True
-                self.cat.cat_index = 0
+            self.cat.update(self.camera.camera_x)
+
+        if self.is_finished():
+            if self.finish_time is None:
+                self.finish_time = pygame.time.get_ticks()
+                self.level_up_sound.play()
+                self.next_level = self.next_world()
+
+                if self.next_level is None:
+                    self.game_completed = True
+
             else:
-                self.cat.update(self.camera.camera_x)
-
-        # Переход на следующий уровень
-        if self.transitioning:
-            now = pygame.time.get_ticks()
-            if now - self.transition_start_time >= self.transition_duration:
-                self.transitioning = False
-
-                if hasattr(self, 'next_level_class') and self.next_level_class:
-                    # создаём новый уровень только сейчас
-                    new_world = self.next_level_class(self.game, lives=self.lives)
-                    new_world.start()
-                    self.game.world = new_world
+                if pygame.time.get_ticks() - self.finish_time >= self.level_wait_time:
+                    if self.next_level:
+                        self.next_level.start()
+                        self.game.world = self.next_level
 
     def draw(self, screen):
         pass
 
     def handle_events(self, events):
-        if self.transitioning:
-            return  # ❄️ кот полностью заморожен
+        pass
 
     def draw_hud(self, screen):
         take_text = "Բռնիր "
@@ -252,14 +241,11 @@ class WorldBase:
                 module_name = f"{package}.{f[:-3]}"
                 module = importlib.import_module(module_name)
 
-                WorldClass = getattr(module, f"World_{world_num}_{level_num}")
-
-                # --- ЗВУК восторга ---
-                self.start_level_transition(WorldClass)
-
                 save_progress(f"World_{world_num}_{level_num}")
 
-                return self
+                WorldClass = getattr(module, f"World_{world_num}_{level_num}")
+
+                return WorldClass(self.game, lives=self.lives)
 
         # ========== 2. ищем следующий мир ==========
         worlds_root = os.path.dirname(folder)

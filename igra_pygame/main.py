@@ -162,20 +162,20 @@ class Game:
             self.world.update()
 
             # --- проверка завершения уровня ---
-            if self.world.is_finished():
-                nxt = self.world.next_world()
-                if nxt:
-                    self.world = nxt
-                    self.world.start()
-                else:
-                    self.you_win_sound.play()  # ← звук победы
-                    self.screen.fill((0, 0, 0))
-                    win = self.font_good.render("YOU WIN 😺🎉", True, (255, 255, 255))
-                    self.screen.blit(win, (SCREEN_WIDTH // 2 - 120, SCREEN_HEIGHT // 2))
-                    pygame.display.flip()
-                    pygame.time.wait(4000)
-                    running = False
-                    continue
+            if hasattr(self.world, "game_completed") and self.world.game_completed:
+                self.you_win_sound.play()
+
+                self.screen.fill((0, 0, 0))
+                win = self.font_good.render("YOU WIN 😺🎉", True, (255, 255, 255))
+                self.screen.blit(
+                    win,
+                    (SCREEN_WIDTH // 2 - win.get_width() // 2, SCREEN_HEIGHT // 2)
+                )
+            
+                pygame.display.flip()
+                pygame.time.wait(4000)
+                running = False
+                continue
 
             if self.world.lives <= 0:
                 self.game_over_sound.play()  # ← звук проигрыша

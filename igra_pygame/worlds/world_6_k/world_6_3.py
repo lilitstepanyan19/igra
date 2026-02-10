@@ -8,17 +8,14 @@ class World_6_3(WorldBase):
 
     def start(self):
         self.person_name = "swan"
-        self.cat_scale = 1.2
-        self.cat_y_offset = -10
+        self.GRAVITY = 0.3
+        self.cat_y_offset = 40
         self.JUMP_POWER = -10
-        self.cat_width = 180
+        self.cat_width = 150
 
         super().start()  # ← создаёт self.cat и self.camera
         self.target = ARMENIAN_LETTERS[self.world_num - 1]
         self.letter_count = LETTER_COUNT
-        self.cat.enable_walk_bounce = True
-        self.cat.walk_bounce_height = 10    # выше подпрыг
-        self.cat.walk_bounce_speed = 0.18   # медленнее, плавнее
 
         self.need = NEED
         self.score = SCORE

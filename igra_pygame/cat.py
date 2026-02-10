@@ -34,6 +34,10 @@ class Cat:
         self.cat_default_height = cat_default_height
         self.cat_y_offset = cat_y_offset
 
+        self.cat_kangaroo_jump_amplitude = 20  # высота подпрыгивания
+        self.cat_kangaroo_jump_speed = 0.1  # скорость подпрыгивания
+        self.cat_kangaroo_phase = 0  # для синуса
+
         # --- load cat frames ---
         self.cat_right = self.load_cat("right", world_num, level_num, person_name)
         self.cat_left = self.load_cat("left", world_num, level_num, person_name)
@@ -47,15 +51,10 @@ class Cat:
         self.cat_vy = 0
         self.GRAVITY = 0.6
         self.JUMP_POWER = -20
+        self.cat_anim_speed = CAT_ANIM_SPEED
         self.on_ground = False
 
         self.GROUND_Y = self.world_height - int(self.cat_default_height) - self.cat_y_offset
-
-        # --- walk bounce (OFF by default) ---
-        self.enable_walk_bounce = False
-        self.walk_bounce_phase = 0
-        self.walk_bounce_speed = 0.2
-        self.walk_bounce_height = 16
 
     def load_cat(self, direction, world_num, level_num, person_name="cat"):
         frames = []
@@ -110,7 +109,6 @@ class Cat:
 
         # гравитация
         self.cat_vy += self.GRAVITY
-        self.cat_y += self.cat_vy
 
         if self.cat_y > self.GROUND_Y:
             self.cat_y = self.GROUND_Y
@@ -126,6 +124,21 @@ class Cat:
             self.cat_frames = self.cat_right if dx > 0 else self.cat_left
             moved = True
 
+        # --- кенгуру-ходьба или обычная гравитация ---
+        if self.on_ground and moved:
+            self.cat_kangaroo_phase += self.cat_kangaroo_jump_speed
+            self.cat_y = (
+                self.GROUND_Y
+                - math.sin(self.cat_kangaroo_phase) * self.cat_kangaroo_jump_amplitude
+            )
+        else:
+            # если в воздухе — прыжок с гравитацией
+            self.cat_y += self.cat_vy
+            if self.cat_y >= self.GROUND_Y:
+                self.cat_y = self.GROUND_Y
+                self.cat_vy = 0
+                self.on_ground = True
+
         # границы X
         rect = self.cat_rect
         if rect.left < self.CAT_BOUNDS.left:
@@ -135,26 +148,16 @@ class Cat:
 
         # анимация
         if moved:
-            self.cat_index += CAT_ANIM_SPEED
+            self.cat_index += self.cat_anim_speed
             if self.cat_index >= len(self.cat_frames):
                 self.cat_index = 0
         else:
             self.cat_index = 0
 
-            # подпрыгивание при ходьбе
-        if self.enable_walk_bounce and moved and self.on_ground:
-            self.walk_bounce_phase += self.walk_bounce_speed
-        else:
-            self.walk_bounce_phase = 0
-
     def draw(self, screen, camera_x):
         """Рисует кота на экране с учётом камеры"""
         frame = self.cat_frames[int(self.cat_index)]
 
-        bounce_y = 0
-        if self.enable_walk_bounce:
-            bounce_y = math.sin(self.walk_bounce_phase) * self.walk_bounce_height
-
-        rect = frame.get_rect(center=(self.cat_x - camera_x, self.cat_y - bounce_y))
+        rect = frame.get_rect(center=(self.cat_x - camera_x, self.cat_y))
 
         screen.blit(frame, rect)

@@ -12,6 +12,8 @@ class World_6_3(WorldBase):
         self.cat_y_offset = 40
         self.JUMP_POWER = -10
         self.cat_width = 150
+        self.cat_kangaroo_jump_amplitude = 5
+        self.cat_kangaroo_jump_speed = 0.1
 
         super().start()  # ← создаёт self.cat и self.camera
         self.target = ARMENIAN_LETTERS[self.world_num - 1]

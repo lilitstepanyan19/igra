@@ -24,8 +24,8 @@ NEED = 4
 SCORE = 0
 LETTER_COUNT = 20
 
-# "ԳԴԵԶԷԸԹԺԻԼԽԾՀՂՃՄՅՆՈՉՊՋՌՎՏՐՑՈՒՓՔԵՕՖ"
-ARMENIAN_LETTERS = "ԱՍՇՁԲԿԳԴԵԶԷԸԹԺԻԼԽԾՀՂՃՄՅՆՈՉՊՋՌՎՏՐՑՈՒՓՔԵՕՖ"
+                         # "ԳԴԶԷԸԹԺԻԼԽԾՀՂՃՄՅՆՈՉՊՋՌՎՏՐՑՈՒՓԵՕՖ"
+ARMENIAN_LETTERS = "ԱՍՇՁԲԿԵԳԴԶԷԸԹԺԻԼԽԾՀՂՃՄՅՆՈՉՊՋՌՎՏՐՑՈՒՓՔԵՕՖ"
 
 
 class WorldBase:
@@ -81,7 +81,7 @@ class WorldBase:
         self.cat.GRAVITY = getattr(self, "GRAVITY", 0.6)
         self.cat.JUMP_POWER = getattr(self, "JUMP_POWER", -20)
         self.cat.cat_anim_speed = getattr(self, 'cat_anim_speed', 0.15)
-        self.cat.cat_kangaroo_jump_amplitude = getattr(self, "cat_kangaroo_jump_amplitude", 20)
+        self.cat.cat_kangaroo_jump_amplitude = getattr(self, "cat_kangaroo_jump_amplitude", 1)
         self.cat.cat_kangaroo_jump_speed = getattr(self, "cat_kangaroo_jump_speed", 0.1)
 
         self.camera = Camera(WIDTH, WORLD_WIDTH)

@@ -34,7 +34,7 @@ class Cat:
         self.cat_default_height = cat_default_height
         self.cat_y_offset = cat_y_offset
 
-        self.cat_kangaroo_jump_amplitude = 20  # высота подпрыгивания
+        self.cat_kangaroo_jump_amplitude = 0  # высота подпрыгивания
         self.cat_kangaroo_jump_speed = 0.1  # скорость подпрыгивания
         self.cat_kangaroo_phase = 0  # для синуса
 

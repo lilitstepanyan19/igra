@@ -4,17 +4,13 @@ from base import WorldBase, WORLD_WIDTH, WORLD_HEIGHT, SCREEN_HEIGHT,NEED, SCORE
 from letter import Letter, LETTER_SPEED  # импортируем новый класс
 
 
-class World_7_3(WorldBase):
+class World_8_1(WorldBase):
 
     def start(self):
-        self.person_name = "deer"
-        self.GRAVITY = 0.3
-        self.cat_y_offset = -20
-        self.JUMP_POWER = -10
-        self.cat_width = 150
-        self.cat_anim_speed = 0.07
-        self.cat_kangaroo_jump_amplitude = 15
-        self.cat_kangaroo_jump_speed = 0.07
+        self.person_name = "lamp"
+        self.JUMP_POWER = -15
+        self.cat_y_offset = 100
+        self.cat_kangaroo_jump_amplitude = 10
 
         super().start()  # ← создаёт self.cat и self.camera
         self.target = ARMENIAN_LETTERS[self.world_num - 1]
@@ -22,9 +18,6 @@ class World_7_3(WorldBase):
 
         self.need = NEED
         self.score = SCORE
-
-        self.good_target_color = (255, 0, 0)
-        self.bad_target_color = (197, 20, 191)
 
         bg_img = self.load_bg()
 
@@ -105,36 +98,11 @@ class World_7_3(WorldBase):
             screen.blit(self.bg, (x - self.camera.camera_x, 0))
 
         # буквы
-        # буквы
         for letter in self.letters:
-            x = letter.x - self.camera.camera_x
-            y = letter.y
-
-            # фон под буквой
-            if letter.bg_img:
-                rect = letter.bg_img.get_rect(center=(x, y))
-                screen.blit(letter.bg_img, rect)
-
-            # другие цвета ТОЛЬКО для этого мира
-            if letter.char == self.target:
-                color = self.good_target_color
-                font = self.game.font_good
-            else:
-                color = self.bad_target_color  # тёмно-синий
-                font = self.game.font_bad
-
-            text = font.render(letter.char, True, color)
-            text_rect = text.get_rect(center=(x, y))
-            screen.blit(text, text_rect)
-
-        self.cat.draw(screen, self.camera.camera_x) 
-
-        # # буквы
-        # for letter in self.letters:
-        #     letter.draw(
-        #         screen,
-        #         self.game.font_good,
-        #         self.game.font_bad,
-        #         self.camera.camera_x,
-        #         self.target,
-        #     )
+            letter.draw(
+                screen,
+                self.game.font_good,
+                self.game.font_bad,
+                self.camera.camera_x,
+                self.target,
+            )

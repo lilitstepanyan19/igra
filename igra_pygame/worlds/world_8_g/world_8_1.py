@@ -9,7 +9,7 @@ class World_8_1(WorldBase):
     def start(self):
         self.person_name = "lamp"
         self.JUMP_POWER = -15
-        self.cat_y_offset = 100
+        self.cat_y_offset = 70
         self.cat_kangaroo_jump_amplitude = 10
 
         super().start()  # ← создаёт self.cat и self.camera

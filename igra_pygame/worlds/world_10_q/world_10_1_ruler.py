@@ -9,8 +9,10 @@ class World_10_1(WorldBase):
     def start(self):
         self.person_name = "mountain_goat"
         self.GRAVITY = 0.3
-        self.cat_y_offset = 20
-        self.JUMP_POWER = -10
+        self.cat_y_offset = 40
+        self.JUMP_POWER = -20
+        self.cat_kangaroo_jump_amplitude = 20
+
 
         super().start()  # ← создаёт self.cat и self.camera
         self.target = ARMENIAN_LETTERS[self.world_num - 1]

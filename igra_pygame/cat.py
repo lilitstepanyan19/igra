@@ -51,8 +51,10 @@ class Cat:
         self.cat_vy = 0
         self.GRAVITY = 0.6
         self.JUMP_POWER = -20
-        self.cat_anim_speed = CAT_ANIM_SPEED
         self.on_ground = False
+
+        self.cat_anim_speed = CAT_ANIM_SPEED
+        self.cat_speed = CAT_SPEED
 
         self.GROUND_Y = self.world_height - int(self.cat_default_height) - self.cat_y_offset
 

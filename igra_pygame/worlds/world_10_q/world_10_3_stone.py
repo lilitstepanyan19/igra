@@ -8,9 +8,9 @@ class World_10_3(WorldBase):
 
     def start(self):
         self.person_name = "mountain_goat"
-        self.GRAVITY = 0.3
+        self.GRAVITY = 0.5
         self.cat_y_offset = 40
-        self.JUMP_POWER = -10
+        self.JUMP_POWER = -20
         self.cat_width = 150
         self.cat_kangaroo_jump_amplitude = 5
         self.cat_kangaroo_jump_speed = 0.1

@@ -2,6 +2,8 @@ import pygame
 import os
 import math
 
+from paths import file_path
+
 CAT_SPEED = 0.3
 CAT_ANIM_SPEED = 0.15
 MOUSE_SPEED = 0.02
@@ -70,7 +72,7 @@ class Cat:
             ):
                 path = os.path.join(folder, name)
                 try:
-                    img = pygame.image.load(path).convert_alpha()
+                    img = pygame.image.load(file_path(path)).convert_alpha()
                     size_width = int(self.cat_width * self.cat_scale)
                     size_height = int(self.cat_height * self.cat_scale)
                     img = pygame.transform.scale(img, (size_width, size_height))

@@ -25,7 +25,7 @@ class Game:
         self.font_big_handwriting = pygame.font.Font('fonts/Vrdznagir.otf', 150)
         self.font_small = pygame.font.Font('fonts/GHEAGpalatBld.otf', 30)
 
-        #-- Sounds ---
+        # -- Sounds ---
         self.game_over_sound = pygame.mixer.Sound("sounds/game_over.wav")
         self.you_win_sound = pygame.mixer.Sound("sounds/game_over.wav")
 
@@ -95,6 +95,7 @@ class Game:
         world_name = load_progress()  # например "World_1_2"
 
         if not world_name:
+            world_num = 1
             def start_first_world():
                 world = World_1_1(self)
                 world.start()
@@ -171,7 +172,7 @@ class Game:
                     win,
                     (SCREEN_WIDTH // 2 - win.get_width() // 2, SCREEN_HEIGHT // 2)
                 )
-            
+
                 pygame.display.flip()
                 pygame.time.wait(4000)
                 running = False

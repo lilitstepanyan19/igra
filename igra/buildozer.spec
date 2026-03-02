@@ -1,7 +1,7 @@
 [app]
 
 # (str) Title of your application
-title = My Application
+title = Իմ կատուն
 
 # (str) Package name
 package.name = myapp
@@ -48,7 +48,7 @@ version = 0.1
 
 # (list) Application requirements
 # comma separated e.g. requirements = sqlite3,kivy
-requirements = python3==3.10.11,pygame==2.1.3
+requirements = python3==3.10.11,pygame==2.1.3,hostpython3,sdl2,sdl2_image,sdl2_mixer,sdl2_ttf
 
 # (str) Custom source folders for requirements
 # Sets custom source for any requirements with recipes

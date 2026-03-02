@@ -1,6 +1,8 @@
 import os
 import pygame
 
+from paths import file_path
+
 
 class LettersScreen:
 
@@ -26,7 +28,7 @@ class LettersScreen:
             files = [f for f in os.listdir(folder) if f.lower().endswith(".png")]
             if files:
                 path = os.path.join(folder, files[0])
-                self.side_img = pygame.image.load(path).convert_alpha()
+                self.side_img = pygame.image.load(file_path(path)).convert_alpha()
 
         self.font_big = self.game.font_big
         self.font_big_handwriting = self.game.font_big_handwriting

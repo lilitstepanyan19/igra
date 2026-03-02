@@ -20,8 +20,8 @@ ANDROID_ABI:UNINITIALIZED=arm64-v8a
 //No help, variable specified on the command line.
 ANDROID_ARM_NEON:UNINITIALIZED=ON
 
-//Build string (default: 20260222)
-BUILD:STRING=20260222
+//Build string (default: 20260302)
+BUILD:STRING=20260302
 
 //Path to a program.
 CMAKE_ADDR2LINE:FILEPATH=/home/smart/.buildozer/android/platform/android-ndk-r25b/toolchains/llvm/prebuilt/linux-x86_64/bin/llvm-addr2line

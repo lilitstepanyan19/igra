@@ -4,6 +4,8 @@ import inspect
 import pygame
 import pygame.mixer
 
+from paths import file_path
+
 from cat import Cat
 from camera import Camera
 from save import save_progress
@@ -45,7 +47,7 @@ class WorldBase:
         self.level_up_sound = pygame.mixer.Sound("sounds/level_up.wav")
 
         self.lives = LIVES_COUNT if lives is None else lives
-        self.heart_img = pygame.image.load("images/heart.png").convert_alpha()
+        self.heart_img = pygame.image.load(file_path("images/heart.png")).convert_alpha()
         self.heart_img = pygame.transform.scale(self.heart_img, (32, 32))
 
         self.finish_time = None        # момент завершения уровня
@@ -93,7 +95,7 @@ class WorldBase:
         if not os.path.exists(path):
             path = "images/world_1/world_1_1/bg_img/bg_1.png"
 
-        return pygame.image.load(path).convert_alpha()
+        return pygame.image.load(file_path(path)).convert_alpha()
 
     def load_letter_bgs(self, world_num, level_num, folder_name="letter_bg"):
         folder = f"images/world_{world_num}/world_{world_num}_{level_num}/{folder_name}/"
@@ -104,7 +106,7 @@ class WorldBase:
             for name in sorted(os.listdir(folder)):
                 if name.startswith("letter_bg") and name.endswith(".png"):
                     path = os.path.join(folder, name)
-                    img = pygame.image.load(path).convert_alpha()
+                    img = pygame.image.load(file_path(path)).convert_alpha()
                     imgs.append(img)
 
         # 👉 если в мире нет своих фонов — берём из world_1_1
@@ -114,7 +116,7 @@ class WorldBase:
                 for name in sorted(os.listdir(fallback)):
                     if name.startswith("letter_bg") and name.endswith(".png"):
                         path = os.path.join(fallback, name)
-                        img = pygame.image.load(path).convert_alpha()
+                        img = pygame.image.load(file_path(path)).convert_alpha()
                         imgs.append(img)
 
         # ===== обработка фонов букв (общие параметры) =====

@@ -1,8 +1,19 @@
-.venv
-
+# Python
 __pycache__/
 *.pyc
+*.pyo
+*.pyd
+
+# Buildozer
 .buildozer/
 bin/
 *.apk
-*.spec
+
+# Android build
+android/
+libs/
+*.so
+*.a
+
+# OS
+.DS_Store

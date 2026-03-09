@@ -5,6 +5,8 @@ import os
 from base import SCREEN_WIDTH, SCREEN_HEIGHT, FPS, ARMENIAN_LETTERS
 from save import load_progress, save_progress, SAVE_FILE
 
+from paths import file_path
+
 from letters_screen import LettersScreen
 from worlds.world_1_a.world_1_1 import World_1_1  # стартовый мир
 # from worlds.world_6_k.world_6_3 import World_6_3
@@ -17,17 +19,17 @@ class Game:
         pygame.display.set_caption("Cat Catch Letters 😺")
         self.clock = pygame.time.Clock()
 
-        self.font_good = pygame.font.Font("fonts/GHEAGpalatBld.otf", 48)
-        self.font_bad = pygame.font.Font("fonts/GHEAGpalatBld.otf", 36)
-        self.font_hud = pygame.font.Font("fonts/GHEAGpalatBld.otf", 24)
+        self.font_good = pygame.font.Font(file_path("fonts/GHEAGpalatBld.otf"), 48)
+        self.font_bad = pygame.font.Font(file_path("fonts/GHEAGpalatBld.otf"), 36)
+        self.font_hud = pygame.font.Font(file_path("fonts/GHEAGpalatBld.otf"), 24)
 
-        self.font_big = pygame.font.Font('fonts/GHEAGpalatBld.otf', 150)
-        self.font_big_handwriting = pygame.font.Font('fonts/Vrdznagir.otf', 150)
-        self.font_small = pygame.font.Font('fonts/GHEAGpalatBld.otf', 30)
+        self.font_big = pygame.font.Font(file_path('fonts/GHEAGpalatBld.otf'), 150)
+        self.font_big_handwriting = pygame.font.Font(file_path('fonts/Vrdznagir.otf'), 150)
+        self.font_small = pygame.font.Font(file_path('fonts/GHEAGpalatBld.otf'), 30)
 
         # -- Sounds ---
-        self.game_over_sound = pygame.mixer.Sound("sounds/game_over.wav")
-        self.you_win_sound = pygame.mixer.Sound("sounds/game_over.wav")
+        self.game_over_sound = pygame.mixer.Sound(file_path("sounds/game_over.wav"))
+        self.you_win_sound = pygame.mixer.Sound(file_path("sounds/game_over.wav"))
 
         self.world = None
 

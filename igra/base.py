@@ -32,7 +32,11 @@ ARMENIAN_LETTERS = "ԱՍՇՁԲԿԵԳՈՔՆՄԴԶԷԸԹԺԻԼԽԾՀՂՃՅՉՊՋՌ
 
 class WorldBase:
     def __init__(self, game, lives=None):
-        pygame.mixer.init()
+        try:
+            if not pygame.mixer.get_init():
+                pygame.mixer.init()
+        except Exception as e:
+            print("Mixer init error:", e)
         self.game = game
         self.score = 0
         self.need = 1
@@ -42,9 +46,9 @@ class WorldBase:
 
         self.person_name = "cat"
 
-        self.eat_sound = pygame.mixer.Sound("sounds/eat.wav")
-        self.eat_bad_sound = pygame.mixer.Sound("sounds/eat.wav")
-        self.level_up_sound = pygame.mixer.Sound("sounds/level_up.wav")
+        self.eat_sound = pygame.mixer.Sound(file_path("sounds/eat.wav"))
+        self.eat_bad_sound = pygame.mixer.Sound(file_path("sounds/eat.wav"))
+        self.level_up_sound = pygame.mixer.Sound(file_path("sounds/level_up.wav"))
 
         self.lives = LIVES_COUNT if lives is None else lives
         self.heart_img = pygame.image.load(file_path("images/heart.png")).convert_alpha()
@@ -54,7 +58,7 @@ class WorldBase:
         self.next_level_class = None   # класс следующего уровня
         self.game_completed = False
         self.level_wait_time = 3000
-        
+
         self.hit_cooldown = 1000   # мс (1 секунда)
         self.last_hit_time = 0
 
@@ -225,9 +229,12 @@ class WorldBase:
     def next_world(self):
 
         # --- текущий файл и папка ---
-        file_path = inspect.getfile(self.__class__)
-        folder = os.path.dirname(file_path)
-        file_name = os.path.basename(file_path)
+        try:
+            class_file = inspect.getfile(self.__class__)
+        except:
+            class_file = __file__
+        folder = os.path.dirname(class_file)
+        file_name = os.path.basename(class_file)
 
         # world_1_2_rain.py -> 1_2_rain
         name = file_name.replace("world_", "").replace(".py", "")
@@ -239,14 +246,27 @@ class WorldBase:
         package = self.__class__.__module__.rsplit(".", 1)[0]
 
         # ========== 1. ищем следующий уровень в той же папке ==========
+        if not os.path.exists(folder):
+            print("Folder not found:", folder)
+            return None
+
         for f in os.listdir(folder):
             if f.startswith(f"world_{world_num}_{level_num}"):
                 module_name = f"{package}.{f[:-3]}"
-                module = importlib.import_module(module_name)
+                try:
+                    module = importlib.import_module(module_name)
+                except Exception as e:
+                    print("Import error:", e)
+                    return None
 
                 save_progress(f"World_{world_num}_{level_num}")
+                class_name = f"World_{world_num}_{level_num}"
 
-                WorldClass = getattr(module, f"World_{world_num}_{level_num}")
+                if not hasattr(module, class_name):
+                    print("Class not found:", class_name)
+                    return None
+
+                WorldClass = getattr(module, class_name)
 
                 return WorldClass(self.game, lives=self.lives)
 

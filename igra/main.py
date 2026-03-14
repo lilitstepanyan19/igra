@@ -14,7 +14,11 @@ from worlds.world_1_a.world_1_1 import World_1_1  # стартовый мир
 class Game:
     def __init__(self):
         pygame.init()
-        pygame.mixer.init()
+        try:
+            pygame.mixer.init()
+        except:
+            print("Mixer not available")
+            
         self.screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
         pygame.display.set_caption("Cat Catch Letters 😺")
         self.clock = pygame.time.Clock()

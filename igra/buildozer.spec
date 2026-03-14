@@ -1,7 +1,7 @@
 [app]
 
 # (str) Title of your application
-title = Իմ կատուն
+title = Աղջիկս
 
 # (str) Package name
 package.name = myapp
@@ -13,7 +13,7 @@ package.domain = org.example
 source.dir = .
 
 # (list) Source files to include (let empty to include all the files)
-source.include_exts = py,png,jpg,ogg,wav
+source.include_exts = py,png,jpg,ogg,wav,ttf,otf,json
 
 # (list) List of inclusions using pattern matching
 #source.include_patterns = assets/*,images/*.png
@@ -22,18 +22,7 @@ source.include_exts = py,png,jpg,ogg,wav
 source.exclude_exts = psd,mp4,zip,rar,log,tmp
 
 # (list) List of directory to exclude (let empty to not exclude anything)
-source.exclude_dirs = tests,bin,.git,__pycache__,build,venv,.venv, 
-        worlds/world_2,
-        worlds/world_3,
-        worlds/world_4,
-        worlds/world_5,
-        worlds/world_6,
-        worlds/world_7,
-        worlds/world_8,
-        worlds/world_9,
-        worlds/world_10,
-        worlds/world_11,
-        worlds/world_12
+source.exclude_dirs = tests,bin,.git,__pycache__,build,venv,.venv
 
 # (list) List of exclusions using pattern matching
 # Do not prefix with './'
@@ -48,7 +37,7 @@ version = 0.1
 
 # (list) Application requirements
 # comma separated e.g. requirements = sqlite3,kivy
-requirements = python3==3.10.11,pygame==2.1.3,hostpython3,sdl2,sdl2_image,sdl2_mixer,sdl2_ttf
+requirements = python3==3.10.12,pygame==2.1.2,hostpython3==3.10.12,sdl2,sdl2_image,sdl2_mixer,sdl2_ttf
 
 # (str) Custom source folders for requirements
 # Sets custom source for any requirements with recipes
@@ -112,10 +101,10 @@ fullscreen = 1
 #android.features = android.hardware.usb.host
 
 # (int) Target Android API, should be as high as possible.
-#android.api = 31
+android.api = 31
 
 # (int) Minimum API your APK / AAB will support.
-#android.minapi = 21
+android.minapi = 21
 
 # (int) Android SDK version to use
 #android.sdk = 20
@@ -124,7 +113,7 @@ fullscreen = 1
 #android.ndk = 23b
 
 # (int) Android NDK API to use. This is the minimum API your app will support, it should usually match android.minapi.
-#android.ndk_api = 21
+android.ndk_api = 21
 
 # (bool) Use --private data storage (True) or --dir public storage (False)
 #android.private_storage = True
@@ -347,7 +336,7 @@ android.debug_artifact = apk
 #p4a.hook =
 
 # (str) Bootstrap to use for android builds
-# p4a.bootstrap = sdl2
+p4a.bootstrap = sdl2
 
 # (int) port number to specify an explicit --port= p4a argument (eg for bootstrap flask)
 #p4a.port =

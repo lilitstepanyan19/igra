@@ -4,7 +4,7 @@ import math
 
 from paths import file_path
 
-CAT_SPEED = 0.3
+CAT_SPEED = 1
 CAT_ANIM_SPEED = 0.15
 MOUSE_SPEED = 0.02
 
@@ -46,7 +46,8 @@ class Cat:
         self.cat_frames = self.cat_right
         self.cat_index = 0
 
-        self.cat_x, self.cat_y = self.screen_width // 2, self.screen_height // 2
+        self.GROUND_Y = self.world_height - int(self.cat_default_height) - self.cat_y_offset
+        self.cat_x, self.cat_y = self.screen_width // 2, self.GROUND_Y
         self.CAT_BOUNDS = pygame.Rect(0, 100, self.world_width, self.world_height - 150)
 
         # --- physics ---
@@ -57,8 +58,6 @@ class Cat:
 
         self.cat_anim_speed = CAT_ANIM_SPEED
         self.cat_speed = CAT_SPEED
-
-        self.GROUND_Y = self.world_height - int(self.cat_default_height) - self.cat_y_offset
 
     def load_cat(self, direction, world_num, level_num, person_name="cat"):
         frames = []
@@ -96,61 +95,67 @@ class Cat:
         moved = False
         keys = pygame.key.get_pressed()
 
-        # бег по стрелкам
+        # === 1. Клавиатура (ПК) — всегда работает ===
         if keys[pygame.K_LEFT]:
-            self.cat_x -= CAT_SPEED
+            self.cat_x -= self.cat_speed
             self.cat_frames = self.cat_left
             moved = True
+
         if keys[pygame.K_RIGHT]:
-            self.cat_x += CAT_SPEED
+            self.cat_x += self.cat_speed
             self.cat_frames = self.cat_right
             moved = True
 
-        # прыжок
         if keys[pygame.K_SPACE] and self.on_ground:
             self.cat_vy = self.JUMP_POWER
             self.on_ground = False
 
-        # гравитация
-        self.cat_vy += self.GRAVITY
+        # === 2. Касание пальцем (Android) ===
+        if pygame.mouse.get_pressed()[0]:
+            mx, my = pygame.mouse.get_pos()
 
-        if self.cat_y > self.GROUND_Y:
+            # Левая половина экрана — влево
+            if mx < self.screen_width // 2:
+                self.cat_x -= self.cat_speed * 1.8
+                self.cat_frames = self.cat_left
+                moved = True
+
+            # Правая половина экрана — вправо
+            else:
+                self.cat_x += self.cat_speed * 1.8
+                self.cat_frames = self.cat_right
+                moved = True
+
+            # Прыжок — верхняя половина экрана
+            if my < self.screen_height // 2 and self.on_ground:
+                self.cat_vy = self.JUMP_POWER
+                self.on_ground = False
+
+        # === 3. Гравитация (всегда работает) ===
+        self.cat_vy += self.GRAVITY
+        self.cat_y += self.cat_vy
+
+        # === 4. Приземление ===
+        if self.cat_y >= self.GROUND_Y:
             self.cat_y = self.GROUND_Y
             self.cat_vy = 0
             self.on_ground = True
 
-        # mouse X только
-        mx, _ = pygame.mouse.get_pos()
-        mx_world = mx + camera_x
-        dx = mx_world - self.cat_x
-        if abs(dx) > 5:
-            self.cat_x += dx * MOUSE_SPEED
-            self.cat_frames = self.cat_right if dx > 0 else self.cat_left
-            moved = True
-
-        # --- кенгуру-ходьба или обычная гравитация ---
+        # === 5. Кенгуру-эффект при ходьбе ===
         if self.on_ground and moved:
             self.cat_kangaroo_phase += self.cat_kangaroo_jump_speed
             self.cat_y = (
                 self.GROUND_Y
                 - math.sin(self.cat_kangaroo_phase) * self.cat_kangaroo_jump_amplitude
             )
-        else:
-            # если в воздухе — прыжок с гравитацией
-            self.cat_y += self.cat_vy
-            if self.cat_y >= self.GROUND_Y:
-                self.cat_y = self.GROUND_Y
-                self.cat_vy = 0
-                self.on_ground = True
 
-        # границы X
-        rect = self.cat_rect
-        if rect.left < self.CAT_BOUNDS.left:
-            self.cat_x += self.CAT_BOUNDS.left - rect.left
-        if rect.right > self.CAT_BOUNDS.right:
-            self.cat_x -= rect.right - self.CAT_BOUNDS.right
+        # === 6. Границы мира ===
+        if self.cat_x < 50:
+            self.cat_x = 50
+        if self.cat_x > self.world_width - 50:
+            self.cat_x = self.world_width - 50
 
-        # анимация
+        # === 7. Анимация ===
         if moved:
             self.cat_index += self.cat_anim_speed
             if self.cat_index >= len(self.cat_frames):

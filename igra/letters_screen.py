@@ -35,6 +35,11 @@ class LettersScreen:
         self.font_small = self.game.font_small
 
         self.is_android = self.game.is_android
+        self.screen_width = self.game.screen_width
+        self.screen_height = self.game.screen_height
+        self.scale = self.game.scale
+        self.center_x = self.game.center_x
+        self.center_y = self.game.center_y
 
         self.next_triggered = False
 
@@ -45,9 +50,7 @@ class LettersScreen:
     def scale_contain(self, image, max_w, max_h):
         w, h = image.get_size()
         scale = min(max_w / w, max_h / h)
-        return pygame.transform.smoothscale(
-            image, (int(w * scale), int(h * scale))
-        )
+        return pygame.transform.smoothscale(image, (int(w * scale), int(h * scale)))
 
     def handle_events(self, events):
         for e in events:
@@ -80,6 +83,12 @@ class LettersScreen:
         return False
 
     def draw(self, screen):
+        self.screen_width = self.game.screen_width
+        self.screen_height = self.game.screen_height
+        self.scale = self.game.scale
+        self.center_x = self.game.center_x
+        self.center_y = self.game.center_y
+        
         screen.fill((93, 173, 226))  # светло-голубой фон
         next_btn_text = f"{self.letters[0]} տառը սովորելու համար "
         # Подсказка внизу — разная для ПК и Android
@@ -88,27 +97,27 @@ class LettersScreen:
         else:
             next_btn_text_2 = " սեղմիր SPACE կամ ENTER"
 
-
         next_btn = self.font_small.render(next_btn_text, True, (6, 48, 48))
         next_btn_2 = self.font_small.render(next_btn_text_2, True, (6, 48 , 48))
 
         screen.blit(
             next_btn,
-            (screen.get_width() // 2 - next_btn.get_width() // 2, screen.get_height() - next_btn.get_height() - next_btn_2.get_height() - 40),
+            (self.center_x - next_btn.get_width() // 2, 
+             self.screen_height - next_btn.get_height() - next_btn_2.get_height() - self.screen_height * 0.04),
         )
         screen.blit(
             next_btn_2,
-            (screen.get_width() // 2 - next_btn_2.get_width() // 2, screen.get_height() - next_btn_2.get_height() - 40),
+            (self.center_x - next_btn_2.get_width() // 2, 
+             self.screen_height - next_btn_2.get_height() - self.screen_height * 0.04),
         )
 
         # Расставляем буквы 2x2
-        rows = 2
         cols = 2
-        spacing_x = 200
-        spacing_y = 200
+        spacing_x = self.screen_width // 4
+        spacing_y = self.screen_height // 4
 
-        start_x = screen.get_width() // 2 - spacing_x - spacing_x // 2
-        start_y = screen.get_height() // 2 - spacing_y - 30
+        start_x = self.center_x - spacing_x - spacing_x // 2
+        start_y = self.center_y - spacing_y - 30
         letters_width = spacing_x * 1.5
         letters_height = spacing_y 
 

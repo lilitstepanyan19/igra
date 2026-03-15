@@ -22,17 +22,17 @@ class Game:
 
         self.is_android = 'ANDROID_ARGUMENT' in os.environ or 'P4A_BOOTSTRAP' in os.environ
 
-        if self.is_android:
-            self.screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
-        else:
-            self.screen = pygame.display.set_mode((900, 600), pygame.RESIZABLE)
-
-        # Реальный размер экрана
-        self.screen_width, self.screen_height = self.screen.get_size()
-
         # Базовый размер (как будто игра на 900×600)
         self.base_width = 900
         self.base_height = 600
+
+        if self.is_android:
+            self.screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
+        else:
+            self.screen = pygame.display.set_mode((self.base_width, self.base_height), pygame.RESIZABLE)
+
+        # Реальный размер экрана
+        self.screen_width, self.screen_height = self.screen.get_size()
 
         # Масштаб (берём минимальный, чтобы не растягивать)
         self.scale = min(
@@ -41,7 +41,7 @@ class Game:
         self.center_x = self.screen_width // 2
         self.center_y = self.screen_height // 2
 
-        pygame.display.set_caption("Cat Catch Letters 😺")
+        pygame.display.set_caption("Տառերն ու կենդանիները")
         self.clock = pygame.time.Clock()
 
         font_scale = self.scale * (1.3 if self.is_android else 1.0)
@@ -63,21 +63,27 @@ class Game:
         """Экран с кнопками Продолжить / Новая игра"""
         running = True
         while running:
+            self.screen_width, self.screen_height = self.screen.get_size()
+            self.scale = min(self.screen_width / self.base_width, self.screen_height / self.base_height)
+            self.center_x = self.screen_width // 2
+            self.center_y = self.screen_height // 2
             self.screen.fill((200, 230, 255))  # светлый фон
 
             # --- Заголовок ---
             title = self.font_good.render("Տառերն ու կենդանիները", True, (0, 0, 0))
             title_x = self.center_x - title.get_width() // 2
-            title_y = int(80 * self.scale)
+            title_y = int(self.screen_height * 0.08 * self.scale)
             self.screen.blit(title, (title_x, title_y))
 
             # --- Кнопки ---
             mouse_x, mouse_y = pygame.mouse.get_pos()
             # Кнопки — крупные, с отступом
-            btn_width = int(400 * self.scale)
-            btn_height = int(100 * self.scale)
-            btn_spacing = int(180 * self.scale)
-            btn_start_y = int(280 * self.scale)
+            btn_width = int(self.screen_width * 0.22 * self.scale)
+            btn_height = int(self.screen_height * 0.08 * self.scale)
+            btn_spacing = int(btn_height * 1.5)
+            btn_start_x = int(self.center_x - btn_width // 2)
+            btn_start_y = int(self.center_y - btn_height // 2 - btn_spacing // 2)
+
 
             buttons = []
 
@@ -85,13 +91,13 @@ class Game:
             cont_text = "Շարունակել"
             cont_surf = self.font_hud.render(cont_text, True, (0, 0, 0))
             cont_rect = pygame.Rect(
-                self.center_x - btn_width // 2,
+                btn_start_x,
                 btn_start_y,
                 btn_width,
                 btn_height
             )
-            pygame.draw.rect(self.screen, (100, 255, 100), cont_rect, border_radius=int(30 * self.scale))
-            pygame.draw.rect(self.screen, (0, 120, 0), cont_rect, int(6 * self.scale), border_radius=int(30 * self.scale))
+            pygame.draw.rect(self.screen, (100, 255, 100), cont_rect, border_radius=int(20 * self.scale))
+            pygame.draw.rect(self.screen, (0, 120, 0), cont_rect, int(6 * self.scale), border_radius=int(20 * self.scale))
             cont_text_rect = cont_surf.get_rect(center=cont_rect.center)
             self.screen.blit(cont_surf, cont_text_rect)
             buttons.append(("continue", cont_rect))
@@ -100,13 +106,13 @@ class Game:
             new_text = "Նոր խաղ"
             new_surf = self.font_hud.render(new_text, True, (0, 0, 0))
             new_rect = pygame.Rect(
-                self.center_x - btn_width // 2,
+                btn_start_x,
                 btn_start_y + btn_spacing,
                 btn_width,
                 btn_height
             )
-            pygame.draw.rect(self.screen, (255, 100, 100), new_rect, border_radius=int(30 * self.scale))
-            pygame.draw.rect(self.screen, (180, 0, 0), new_rect, int(6 * self.scale), border_radius=int(30 * self.scale))
+            pygame.draw.rect(self.screen, (255, 100, 100), new_rect, border_radius=int(20 * self.scale))
+            pygame.draw.rect(self.screen, (180, 0, 0), new_rect, int(6 * self.scale), border_radius=int(20 * self.scale))
             new_text_rect = new_surf.get_rect(center=new_rect.center)
             self.screen.blit(new_surf, new_text_rect)
             buttons.append(("new", new_rect))

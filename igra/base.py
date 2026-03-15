@@ -17,8 +17,6 @@ WORLD_HEIGHT = 600
 
 WIDTH, HEIGHT = 900, 600
 
-SCREEN_WIDTH = 900
-SCREEN_HEIGHT = 600
 FPS = 60
 
 LIVES_COUNT = 3
@@ -43,6 +41,8 @@ class WorldBase:
         self.target = None
         self.cat = None
         self.camera = None
+        self.screen_width = game.screen_width
+        self.screen_height = game.screen_height
 
         self.person_name = "cat"
 
@@ -72,8 +72,8 @@ class WorldBase:
 
     def start(self):
         self.cat = Cat(
-            SCREEN_WIDTH,
-            SCREEN_HEIGHT,
+            self.screen_width,
+            self.screen_height,
             WORLD_WIDTH,
             WORLD_HEIGHT,
             self.world_num,
@@ -207,14 +207,14 @@ class WorldBase:
 
         heart_img_scaled = pygame.transform.scale(self.heart_img, (int(heart_size), int(heart_size)))
         # координаты справа сверху
-        heart_x = SCREEN_WIDTH - heart_size - 20
+        heart_x = self.screen_width - heart_size - 20
         heart_y = 20
         screen.blit(heart_img_scaled, (heart_x, heart_y))
 
         # показываем число жизней рядом
         lives_text = f"x {self.lives}"
         lives_surf = self.game.font_hud.render(lives_text, True, (0, 0, 0))
-        lives_x = SCREEN_WIDTH - heart_size / 2 - lives_surf.get_width() / 2 - 20
+        lives_x = self.screen_width - heart_size / 2 - lives_surf.get_width() / 2 - 20
         lives_y = heart_y + (heart_size - lives_surf.get_height()) / LIVES_COUNT
         screen.blit(lives_surf, (lives_x, lives_y))
 

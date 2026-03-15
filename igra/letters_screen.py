@@ -34,6 +34,10 @@ class LettersScreen:
         self.font_big_handwriting = self.game.font_big_handwriting
         self.font_small = self.game.font_small
 
+        self.is_android = self.game.is_android
+
+        self.next_triggered = False
+
     def start(self):
         self.anim_time = 0
         self.img_anim_time = 0
@@ -49,10 +53,17 @@ class LettersScreen:
         for e in events:
             if e.type == pygame.KEYDOWN:
                 if e.key in (pygame.K_SPACE, pygame.K_RETURN):
-                    # делаем переход на следующий мир
-                    self.game.world = self.next_world_func()
-                    if self.game.world:
-                        self.game.world.start()
+                    self._go_next()
+
+            elif e.type == pygame.MOUSEBUTTONDOWN:
+                self._go_next()
+
+    def _go_next(self):
+        if not hasattr(self, 'next_triggered') or not self.next_triggered:
+            self.next_triggered = True
+            self.game.world = self.next_world_func()
+            if self.game.world:
+                self.game.world.start()
 
     def update(self):
         self.anim_time += 1
@@ -71,7 +82,12 @@ class LettersScreen:
     def draw(self, screen):
         screen.fill((93, 173, 226))  # светло-голубой фон
         next_btn_text = f"{self.letters[0]} տառը սովորելու համար "
-        next_btn_text_2 = " սեղմիր SPACE կամ ENTER "
+        # Подсказка внизу — разная для ПК и Android
+        if self.is_android:
+            next_btn_text_2 = " սեղմիր էկրանին"
+        else:
+            next_btn_text_2 = " սեղմիր SPACE կամ ENTER"
+
 
         next_btn = self.font_small.render(next_btn_text, True, (6, 48, 48))
         next_btn_2 = self.font_small.render(next_btn_text_2, True, (6, 48 , 48))

@@ -32,7 +32,8 @@ class Game:
             self.screen = pygame.display.set_mode((self.base_width, self.base_height), pygame.RESIZABLE)
 
         # Реальный размер экрана
-        self.screen_width, self.screen_height = self.screen.get_size()
+        self.screen_width = self.screen.get_width()
+        self.screen_height = self.screen.get_height()
 
         # Масштаб (берём минимальный, чтобы не растягивать)
         self.scale = min(
@@ -83,7 +84,6 @@ class Game:
             btn_spacing = int(btn_height * 1.5)
             btn_start_x = int(self.center_x - btn_width // 2)
             btn_start_y = int(self.center_y - btn_height // 2 - btn_spacing // 2)
-
 
             buttons = []
 

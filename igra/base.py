@@ -85,7 +85,7 @@ class WorldBase:
             cat_y_offset=getattr(self, "cat_y_offset", 0),
         )
         self.cat.GRAVITY = getattr(self, "GRAVITY", 0.6)
-        self.cat.JUMP_POWER = getattr(self, "JUMP_POWER", -20)
+        self.cat.JUMP_POWER = getattr(self, "JUMP_POWER", -(self.screen_height * 0.023))
         self.cat.cat_anim_speed = getattr(self, 'cat_anim_speed', 0.15)
         self.cat.cat_speed = getattr(self, 'cat_speed', 0.3)
         self.cat.cat_kangaroo_jump_amplitude = getattr(self, "cat_kangaroo_jump_amplitude", 1)
@@ -125,8 +125,9 @@ class WorldBase:
 
         # ===== обработка фонов букв (общие параметры) =====
         new_imgs = []
+        bg_size = int(self.game.screen_height * 0.089)
         for img in imgs:
-            img = pygame.transform.smoothscale(img, (80, 80)).convert_alpha()  # размер
+            img = pygame.transform.smoothscale(img, (bg_size, bg_size)).convert_alpha()  # размер
             img.set_alpha(220)  # прозрачность
             new_imgs.append(img)
 
@@ -163,6 +164,10 @@ class WorldBase:
         pass
 
     def draw_hud(self, screen):
+        w = screen.get_width()  # ← всегда актуальный размер
+        h = screen.get_height()
+        bg_size = int(h * 0.089)
+
         take_text = "Բռնիր "
         count_text = f" {self.need - self.score} հատ"
 
@@ -171,14 +176,15 @@ class WorldBase:
         count_surf = self.game.font_hud.render(count_text, True, (0, 0, 0))
 
         # Позиции
-        x, y = 20, 60
+        x = int(h * 0.022)
+        y = int(h * 0.066)
 
         screen.blit(take_surf, (x, y))
         x += take_surf.get_width()
 
         if self.letter_bg_imgs:
             bg_img = self.letter_bg_imgs[0]  # или random.choice(self.letter_bg_imgs)
-            bg_rect = bg_img.get_rect(topleft=(x, y - 10))
+            bg_rect = bg_img.get_rect(topleft=(x, y - int(h * 0.01)))
             screen.blit(bg_img, bg_rect)
 
             # текст поверх фона
@@ -190,14 +196,14 @@ class WorldBase:
         else:
             # если фона нет — обычная буква
             target_surf = self.game.font_good.render(self.target, True, (0, 220, 0))
-            screen.blit(target_surf, (x, y - 5))
+            screen.blit(target_surf, (x, y - int(h * 0.005)))
             x += target_surf.get_width()
 
         screen.blit(count_surf, (x, y))
 
         # --- Большое сердце и количество жизней ---
-        max_heart_size = 80  # максимальный размер сердца
-        min_heart_size = 40  # размер, если lives = 1
+        max_heart_size = int(h * 0.1)
+        min_heart_size = int(h * 0.045)
 
         # размер сердца пропорционален количеству жизней
         if self.lives > 0:
@@ -207,21 +213,21 @@ class WorldBase:
 
         heart_img_scaled = pygame.transform.scale(self.heart_img, (int(heart_size), int(heart_size)))
         # координаты справа сверху
-        heart_x = self.screen_width - heart_size - 20
-        heart_y = 20
+        heart_x = w - int(heart_size) - int(h * 0.022)
+        heart_y = int(h * 0.022)
         screen.blit(heart_img_scaled, (heart_x, heart_y))
 
         # показываем число жизней рядом
         lives_text = f"x {self.lives}"
         lives_surf = self.game.font_hud.render(lives_text, True, (0, 0, 0))
-        lives_x = self.screen_width - heart_size / 2 - lives_surf.get_width() / 2 - 20
+        lives_x = w - heart_size / 2 - lives_surf.get_width() / 2 - int(h * 0.022)
         lives_y = heart_y + (heart_size - lives_surf.get_height()) / LIVES_COUNT
         screen.blit(lives_surf, (lives_x, lives_y))
 
         # --- WORLD / LEVEL и счет ---
         header_text = f"Աշխարհ {self.world_num}, Փուլ- {self.level_num}   {self.score}/{self.need}"
         header_surf = self.game.font_hud.render(header_text, True, (0, 0, 0))
-        screen.blit(header_surf, (20, 20))
+        screen.blit(header_surf, (int(h * 0.022), int(h * 0.022)))
 
     def is_finished(self):
         return self.score >= self.need

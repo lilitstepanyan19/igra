@@ -18,7 +18,6 @@ class Cat:
         cat_scale=1.0,
         cat_width=120,
         cat_height=120,
-        cat_default_height=120,
         cat_y_offset=0,
         
     ):
@@ -30,7 +29,7 @@ class Cat:
         self.cat_scale = cat_scale
         self.cat_width = cat_width
         self.cat_height = cat_height
-        self.cat_default_height = cat_default_height
+        self.cat_default_height = self.screen_height * 0.15  # базовая высота кота от нижнего края
         self.cat_y_offset = cat_y_offset
 
         self.cat_kangaroo_jump_amplitude = 0  # высота подпрыгивания
@@ -47,7 +46,7 @@ class Cat:
 
         self.cat_x = self.screen_width // 2
         self.cat_y = self.GROUND_Y
-        self.CAT_BOUNDS = pygame.Rect(0, 100, self.world_width, self.world_height - 150)
+        self.CAT_BOUNDS = pygame.Rect(0, 100, self.world_width, self.world_height - self.world_height * 0.15)
         self.cat_vy = 0
         self.GRAVITY = 0.6
         self.JUMP_POWER = -20

@@ -15,14 +15,6 @@ class World_1_1(WorldBase):
         self.need = NEED
         self.score = SCORE
 
-        bg_img = self.load_bg()
-
-        h = self.screen_height
-        scale = self.screen_height / bg_img.get_height()
-        w = int(bg_img.get_width() * scale)
-        self.bg = pygame.transform.smoothscale(bg_img, (w, h))
-        self.bg_w = self.bg.get_width()
-
         self.letters = []
 
         self.load_letter_bgs(self.world_num, self.level_num)
@@ -89,6 +81,14 @@ class World_1_1(WorldBase):
         self.spawn(self.letter_count)
 
     def draw(self, screen):
+        bg_img = self.load_bg()
+
+        h = screen.get_height()
+        scale = h / bg_img.get_height()
+        w = int(bg_img.get_width() * scale)
+        self.bg = pygame.transform.smoothscale(bg_img, (w, h))
+        self.bg_w = self.bg.get_width()
+
         # фон
         for x in range(0, WORLD_WIDTH, self.bg_w):
             screen.blit(self.bg, (x - self.camera.camera_x, 0))

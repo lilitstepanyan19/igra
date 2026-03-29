@@ -82,15 +82,15 @@ class WorldBase:
             cat_scale=getattr(self, "cat_scale", 1.0),  # ✅ ВАЖНО
             cat_width=getattr(self, "cat_width", 120),
             cat_height=getattr(self, "cat_height", 120),
-            cat_y_offset=getattr(self, "cat_y_offset", 0),
+            cat_y_offset=getattr(self, "cat_y_offset", 15),
         )
         self.cat.GRAVITY = getattr(self, "GRAVITY", 0.6)
         self.cat.JUMP_POWER = getattr(self, "JUMP_POWER", -(self.screen_height * 0.023))
         self.cat.cat_anim_speed = getattr(self, 'cat_anim_speed', 0.15)
-        self.cat.cat_speed = getattr(self, 'cat_speed', 0.3)
+        self.cat.cat_speed = getattr(self, 'cat_speed', 8)
         self.cat.cat_kangaroo_jump_amplitude = getattr(self, "cat_kangaroo_jump_amplitude", 1)
         self.cat.cat_kangaroo_jump_speed = getattr(self, "cat_kangaroo_jump_speed", 0.1)
-
+        
         self.camera = Camera(WIDTH, WORLD_WIDTH)
 
     def load_bg(self, bg_img_num=1):

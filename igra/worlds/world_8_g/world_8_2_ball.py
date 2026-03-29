@@ -1,7 +1,7 @@
 import pygame
 import math
 import random
-from base import WorldBase, WORLD_WIDTH, WORLD_HEIGHT, SCREEN_HEIGHT, NEED, SCORE, LETTER_COUNT, ARMENIAN_LETTERS
+from base import WorldBase, WORLD_WIDTH, WORLD_HEIGHT, NEED, SCORE, LETTER_COUNT, ARMENIAN_LETTERS
 from letter import Letter, LETTER_SPEED
 
 
@@ -65,7 +65,7 @@ class World_8_3(WorldBase):
         self.JUMP_POWER = -15
         self.cat_y_offset = 30
         self.cat_kangaroo_jump_amplitude = 10
-        
+
         super().start()  # ← создаёт self.cat и self.camera
 
         self.target = ARMENIAN_LETTERS[self.world_num - 1].lower()
@@ -77,9 +77,9 @@ class World_8_3(WorldBase):
         # ===== ФОН =====
         bg_img = self.load_bg()
 
-        scale = SCREEN_HEIGHT / bg_img.get_height()
+        scale = self.screen_height / bg_img.get_height()
         w = int(bg_img.get_width() * scale)
-        h = SCREEN_HEIGHT
+        h = self.screen_height
         self.bg = pygame.transform.smoothscale(bg_img, (w, h))
         self.bg_w = self.bg.get_width()
 

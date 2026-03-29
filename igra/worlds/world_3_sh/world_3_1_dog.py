@@ -1,6 +1,6 @@
 import pygame
 import random
-from base import WorldBase, WORLD_WIDTH, WORLD_HEIGHT, SCREEN_HEIGHT,NEED, SCORE,  LETTER_COUNT, ARMENIAN_LETTERS
+from base import WorldBase, WORLD_WIDTH, WORLD_HEIGHT,NEED, SCORE,  LETTER_COUNT, ARMENIAN_LETTERS
 from letter import Letter, LETTER_SPEED  # импортируем новый класс
 
 
@@ -20,14 +20,14 @@ class World_3_1(WorldBase):
         bg_img = self.load_bg()
         bg_img_front = self.load_bg(2)
         # задний фон
-        h = SCREEN_HEIGHT
-        scale = SCREEN_HEIGHT / bg_img.get_height()
+        h = self.screen_height
+        scale = self.screen_height / bg_img.get_height()
         w = int(bg_img.get_width() * scale)
         self.bg = pygame.transform.smoothscale(bg_img, (w, h))
         self.bg_w = self.bg.get_width()
 
         # передний фон
-        scale_f = SCREEN_HEIGHT / bg_img_front.get_height()
+        scale_f = self.screen_height / bg_img_front.get_height()
         w_f = int(bg_img_front.get_width() * scale_f)
         self.bg_front = pygame.transform.smoothscale(bg_img_front, (w_f, h))
         self.bg_front_w = self.bg_front.get_width()

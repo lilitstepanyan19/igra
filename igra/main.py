@@ -221,7 +221,7 @@ class Game:
                 self.you_win_sound.play()
 
                 self.screen.fill((0, 0, 0))
-                win = self.font_good.render("Դու արդեն գիտես բոլոր տառեըը", True, (255, 255, 255))
+                win = self.font_good.render("Դու արդեն գիտես բոլոր տառեը", True, (255, 255, 255))
                 self.screen.blit(
                     win,
                     (self.screen_width // 2 - win.get_width() // 2, self.screen_height // 2)
@@ -235,7 +235,7 @@ class Game:
             if self.world.lives <= 0:
                 self.game_over_sound.play()  # ← звук проигрыша
                 self.screen.fill((0, 0, 0))
-                lose = self.font_good.render("GAME OVER 😿", True, (255, 0, 0))
+                lose = self.font_good.render("Պարտվեցիր", True, (255, 0, 0))
                 self.screen.blit(lose, (self.screen_width // 2 - 120, self.screen_height // 2))
                 pygame.display.flip()
                 pygame.time.wait(3000)
@@ -254,7 +254,8 @@ class Game:
                 cat = self.world.cat
                 cam = self.world.camera
                 screen_x = cat.cat_x - cam.camera_x
-                screen_y = cat.cat_y
+                screen_y = cat.cat_y - (cat.world_height - self.screen_height)
+
                 img = cat.cat_frames[int(cat.cat_index)]
                 self.screen.blit(img, img.get_rect(center=(screen_x, screen_y)))
 

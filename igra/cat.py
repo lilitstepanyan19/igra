@@ -44,13 +44,13 @@ class Cat:
 
         self.GROUND_Y = self.world_height - int(self.cat_default_height) - self.cat_y_offset
 
-        self.cat_x = self.screen_width // 2
+        self.cat_x = 300
         self.cat_y = self.GROUND_Y
         self.CAT_BOUNDS = pygame.Rect(0, 100, self.world_width, self.world_height - self.world_height * 0.15)
         self.cat_vy = 0
         self.GRAVITY = 0.6
         self.JUMP_POWER = -20
-        self.on_ground = False
+        self.on_ground = True
 
         self.cat_speed = 8
         self.cat_anim_speed = 0.15
@@ -94,11 +94,11 @@ class Cat:
 
         # бег по стрелкам
         if keys[pygame.K_LEFT]:
-            self.cat_x -= self.cat_speed * 20
+            self.cat_x -= self.cat_speed 
             self.cat_frames = self.cat_left
             moved = True
         if keys[pygame.K_RIGHT]:
-            self.cat_x += self.cat_speed * 20
+            self.cat_x += self.cat_speed
             self.cat_frames = self.cat_right
             moved = True
 
@@ -123,13 +123,13 @@ class Cat:
 
             # Левая половина экрана — влево
             if mx < self.screen_width // 2:
-                self.cat_x -= self.cat_speed * 20  # чуть быстрее пальцем
+                self.cat_x -= self.cat_speed 
                 self.cat_frames = self.cat_left
                 moved = True
 
             # Правая половина экрана — вправо
             else:
-                self.cat_x += self.cat_speed * 20
+                self.cat_x += self.cat_speed 
                 self.cat_frames = self.cat_right
                 moved = True
 
@@ -145,16 +145,10 @@ class Cat:
                 self.GROUND_Y
                 - math.sin(self.cat_kangaroo_phase) * self.cat_kangaroo_jump_amplitude
             )
-        else:
-            # если в воздухе — прыжок с гравитацией
-            self.cat_y += self.cat_vy
-            if self.cat_y >= self.GROUND_Y:
-                self.cat_y = self.GROUND_Y
-                self.cat_vy = 0
-                self.on_ground = True
 
         # гравитация
         self.cat_vy += self.GRAVITY
+        self.cat_y += self.cat_vy
 
         if self.cat_y > self.GROUND_Y:
             self.cat_y = self.GROUND_Y

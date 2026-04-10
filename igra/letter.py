@@ -34,11 +34,14 @@ class Letter:
         # выбираем цвет: зелёный для цели, красный для остальных
         font = font_good if self.char == target else font_bad
         color = (0, 180, 0) if self.char == target else (180, 0, 0)
-    
+
         # рендерим букву
         text_surf = font.render(self.char, True, color)
         text_rect = text_surf.get_rect(center=(self.x - camera_x, self.y))
         screen.blit(text_surf, text_rect)
+
+        # --- рамка вокруг буквы ---
+        # pygame.draw.rect(screen, (0, 255, 0), text_rect, 2)  # зелёная рамка
 
     def check_collision(self, cat_rect):
         # прямоугольник буквы для столкновения

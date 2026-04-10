@@ -2,7 +2,7 @@ import pygame
 import sys
 import importlib
 import os
-from base import FPS, ARMENIAN_LETTERS
+from base import FPS, ARMENIAN_LETTERS, WIDTH, HEIGHT
 from save import load_progress, save_progress, SAVE_FILE
 
 from paths import file_path
@@ -23,8 +23,8 @@ class Game:
         self.is_android = 'ANDROID_ARGUMENT' in os.environ or 'P4A_BOOTSTRAP' in os.environ
 
         # Базовый размер (как будто игра на 900×600)
-        self.base_width = 900
-        self.base_height = 600
+        self.base_width = WIDTH
+        self.base_height = HEIGHT
 
         if self.is_android:
             self.screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
@@ -41,6 +41,8 @@ class Game:
         )
         self.center_x = self.screen_width // 2
         self.center_y = self.screen_height // 2
+
+        self.virtual_surface = pygame.Surface((self.base_width, self.base_height))
 
         pygame.display.set_caption("Տառերն ու կենդանիները")
         self.clock = pygame.time.Clock()
@@ -245,21 +247,24 @@ class Game:
             # --- ОЧИСТКА ЭКРАНА ---
             self.screen.fill((255, 255, 255))
 
-            # --- РИСУЕМ МИР ---
-            self.world.draw(self.screen)
+            # 1. Рисуем мир
+            self.virtual_surface.fill((255, 255, 255))
+            self.world.draw(self.virtual_surface)
+
+            # 2. Масштабируем мир
+            scaled = pygame.transform.smoothscale(
+                self.virtual_surface, (self.screen_width, self.screen_height)
+            )
+            self.screen.blit(scaled, (0, 0))
+
+            # 3. Рисуем HUD ПОВЕРХ (без scale)
             self.world.draw_hud(self.screen)
 
-            # --- РИСУЕМ КОТА ЧЕРЕЗ КАМЕРУ ---
-            if self.world.cat and self.world.camera:
-                cat = self.world.cat
-                cam = self.world.camera
-                screen_x = cat.cat_x - cam.camera_x
-                screen_y = cat.cat_y - (cat.world_height - self.screen_height)
+            # 4. OVERLAY (LettersScreen или любые экраны)
+            if hasattr(self.world, "draw_overlay"):
+                self.world.draw_overlay(self.screen)
 
-                img = cat.cat_frames[int(cat.cat_index)]
-                self.screen.blit(img, img.get_rect(center=(screen_x, screen_y)))
-
-                # --- обработка событий ---
+            # --- обработка событий ---
             self.world.handle_events(events)
 
             pygame.display.flip()

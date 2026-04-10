@@ -17,7 +17,7 @@ WORLD_HEIGHT = 600
 
 WIDTH, HEIGHT = 900, 600
 
-FPS = 60
+FPS = 30
 
 LIVES_COUNT = 3
 NEED = 4
@@ -41,8 +41,8 @@ class WorldBase:
         self.target = None
         self.cat = None
         self.camera = None
-        self.screen_width = game.screen_width
-        self.screen_height = game.screen_height
+        self.screen_width = game.base_width
+        self.screen_height = game.base_height
 
         self.person_name = "cat"
 
@@ -72,6 +72,7 @@ class WorldBase:
 
     def start(self):
         self.cat = Cat(
+            FPS,
             self.screen_width,
             self.screen_height,
             WORLD_WIDTH,
@@ -90,8 +91,8 @@ class WorldBase:
         self.cat.cat_speed = getattr(self, 'cat_speed', 8)
         self.cat.cat_kangaroo_jump_amplitude = getattr(self, "cat_kangaroo_jump_amplitude", 1)
         self.cat.cat_kangaroo_jump_speed = getattr(self, "cat_kangaroo_jump_speed", 0.1)
-        
-        self.camera = Camera(WIDTH, WORLD_WIDTH)
+
+        self.camera = Camera(WIDTH, HEIGHT, WORLD_WIDTH, WORLD_HEIGHT)
 
     def load_bg(self, bg_img_num=1):
         path = f"images/world_{self.world_num}/world_{self.world_num}_{self.level_num}/bg_img/bg_{bg_img_num}.png"
@@ -137,10 +138,13 @@ class WorldBase:
 
     def update(self):
         if self.camera:
-            self.camera.update(self.cat.cat_x if self.cat else 0)
+            self.camera.update(
+                self.cat.cat_x if self.cat else 0, 
+                self.cat.cat_y if self.cat else 0
+            )
 
         if self.cat:
-            self.cat.update(self.camera.camera_x)
+            self.cat.update(self.camera.camera_x, self.camera.camera_y)
 
         if self.is_finished():
             if self.finish_time is None:
@@ -220,8 +224,8 @@ class WorldBase:
         # показываем число жизней рядом
         lives_text = f"x {self.lives}"
         lives_surf = self.game.font_hud.render(lives_text, True, (0, 0, 0))
-        lives_x = w - heart_size / 2 - lives_surf.get_width() / 2 - int(h * 0.022)
-        lives_y = heart_y + (heart_size - lives_surf.get_height()) / LIVES_COUNT
+        lives_x = heart_x + heart_size // 2 - lives_surf.get_width() // 2
+        lives_y = heart_y + heart_size // 2 - lives_surf.get_height() // 2
         screen.blit(lives_surf, (lives_x, lives_y))
 
         # --- WORLD / LEVEL и счет ---

@@ -15,6 +15,14 @@ class World_1_1(WorldBase):
         self.need = NEED
         self.score = SCORE
 
+        bg_img = self.load_bg()
+
+        h = self.game.base_height
+        scale = h / bg_img.get_height()
+        w = int(bg_img.get_width() * scale)
+        self.bg = pygame.transform.smoothscale(bg_img, (w, h))
+        self.bg_w = self.bg.get_width()
+
         self.letters = []
 
         self.load_letter_bgs(self.world_num, self.level_num)
@@ -29,8 +37,8 @@ class World_1_1(WorldBase):
 
         if target_count == 0:
             letter_bg = random.choice(self.letter_bg_imgs)
-            x = random.randint(60, WORLD_WIDTH - 60)
-            y = random.randint(140, WORLD_HEIGHT - 60)
+            x = random.randint(60, self.game.base_width - 60)
+            y = random.randint(140, self.game.base_height - 60)
             vx = random.choice([-1, 1]) * LETTER_SPEED
             vy = random.choice([-1, 1]) * LETTER_SPEED
             self.letters.append(Letter(self.target, x, y, vx, vy, letter_bg))
@@ -81,17 +89,12 @@ class World_1_1(WorldBase):
         self.spawn(self.letter_count)
 
     def draw(self, screen):
-        bg_img = self.load_bg()
-
-        h = screen.get_height()
-        scale = h / bg_img.get_height()
-        w = int(bg_img.get_width() * scale)
-        self.bg = pygame.transform.smoothscale(bg_img, (w, h))
-        self.bg_w = self.bg.get_width()
 
         # фон
         for x in range(0, WORLD_WIDTH, self.bg_w):
             screen.blit(self.bg, (x - self.camera.camera_x, 0))
+
+        self.cat.draw(screen, self.camera.camera_x, self.camera.camera_y)
 
         # буквы
         for letter in self.letters:

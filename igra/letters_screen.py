@@ -35,12 +35,7 @@ class LettersScreen:
         self.font_small = self.game.font_small
 
         self.is_android = self.game.is_android
-        self.screen_width = self.game.screen_width
-        self.screen_height = self.game.screen_height
-        self.scale = self.game.scale
-        self.center_x = self.game.center_x
-        self.center_y = self.game.center_y
-
+       
         self.next_triggered = False
 
     def start(self):
@@ -81,13 +76,13 @@ class LettersScreen:
 
     def is_finished(self):
         return False
-
+    
     def draw(self, screen):
-        self.screen_width = self.game.screen_width
-        self.screen_height = self.game.screen_height
+        self.screen_width = screen.get_width()
+        self.screen_height = screen.get_height()
         self.scale = self.game.scale
-        self.center_x = self.game.center_x
-        self.center_y = self.game.center_y
+        self.center_x = self.screen_width // 2
+        self.center_y = self.screen_height // 2
         
         screen.fill((93, 173, 226))  # светло-голубой фон
         next_btn_text = f"{self.letters[0]} տառը սովորելու համար "
@@ -113,8 +108,8 @@ class LettersScreen:
 
         # Расставляем буквы 2x2
         cols = 2
-        spacing_x = self.screen_width // 4
-        spacing_y = self.screen_height // 4
+        spacing_x = int(self.screen_width * 0.20)
+        spacing_y = int(self.screen_height * 0.20)
 
         start_x = self.center_x - spacing_x - spacing_x // 2
         start_y = self.center_y - spacing_y - 30
@@ -163,3 +158,6 @@ class LettersScreen:
         bg_surf.fill((0, 0, 0, 100))
         # screen.blit(bg_surf, (x - 10, y - 10))
         # рендер буквы
+    
+    def draw_overlay(self, screen):
+        self.draw(screen)

@@ -8,6 +8,7 @@ class Cat:
 
     def __init__(
         self,
+        fps,
         screen_width,
         screen_height,
         world_width,
@@ -21,6 +22,7 @@ class Cat:
         cat_y_offset=0,
         
     ):
+        self.fps = fps
         self.screen_width = screen_width
         self.screen_height = screen_height
         self.world_width = world_width
@@ -88,23 +90,23 @@ class Cat:
             center=(self.cat_x, self.cat_y)
         )
 
-    def update(self, camera_x):
+    def update(self, camera_x, camera_y):
         moved = False
         keys = pygame.key.get_pressed()
 
         # бег по стрелкам
         if keys[pygame.K_LEFT]:
-            self.cat_x -= self.cat_speed 
+            self.cat_x -= self.cat_speed * 1.2
             self.cat_frames = self.cat_left
             moved = True
         if keys[pygame.K_RIGHT]:
-            self.cat_x += self.cat_speed
+            self.cat_x += self.cat_speed * 1.2
             self.cat_frames = self.cat_right
             moved = True
 
         # прыжок
         if keys[pygame.K_SPACE] and self.on_ground:
-            self.cat_vy = self.JUMP_POWER
+            self.cat_vy = self.JUMP_POWER 
             self.on_ground = False
 
         # mouse X только
@@ -123,19 +125,19 @@ class Cat:
 
             # Левая половина экрана — влево
             if mx < self.screen_width // 2:
-                self.cat_x -= self.cat_speed 
+                self.cat_x -= self.cat_speed * 1.8
                 self.cat_frames = self.cat_left
                 moved = True
 
             # Правая половина экрана — вправо
             else:
-                self.cat_x += self.cat_speed 
+                self.cat_x += self.cat_speed * 1.8
                 self.cat_frames = self.cat_right
                 moved = True
 
             # Прыжок — верхняя половина экрана
             if my < self.screen_height // 2 and self.on_ground:
-                self.cat_vy = self.JUMP_POWER
+                self.cat_vy = self.JUMP_POWER 
                 self.on_ground = False
 
         # --- кенгуру-ходьба или обычная гравитация ---
@@ -147,13 +149,14 @@ class Cat:
             )
 
         # гравитация
-        self.cat_vy += self.GRAVITY
-        self.cat_y += self.cat_vy
+        if not self.on_ground:
+            self.cat_vy += self.GRAVITY
+            self.cat_y += self.cat_vy
 
-        if self.cat_y > self.GROUND_Y:
-            self.cat_y = self.GROUND_Y
-            self.cat_vy = 0
-            self.on_ground = True
+            if self.cat_y > self.GROUND_Y:
+                self.cat_y = self.GROUND_Y
+                self.cat_vy = 0
+                self.on_ground = True
 
         # границы X
         rect = self.cat_rect
@@ -170,10 +173,11 @@ class Cat:
         else:
             self.cat_index = 0
 
-    def draw(self, screen, camera_x):
+    def draw(self, screen, camera_x, camera_y):
+
         """Рисует кота на экране с учётом камеры"""
         frame = self.cat_frames[int(self.cat_index)]
 
-        rect = frame.get_rect(center=(self.cat_x - camera_x, self.cat_y))
+        rect = frame.get_rect(center=(self.cat_x - camera_x, self.cat_y - camera_y))
 
         screen.blit(frame, rect)

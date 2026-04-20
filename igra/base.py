@@ -70,6 +70,9 @@ class WorldBase:
         self.world_num = int(w)
         self.level_num = int(l)
 
+        self.touch_down = False
+        self.touch_pos = (0, 0)
+
     def start(self):
         self.cat = Cat(
             FPS,
@@ -144,7 +147,12 @@ class WorldBase:
             )
 
         if self.cat:
-            self.cat.update(self.camera.camera_x, self.camera.camera_y)
+            self.cat.update(
+                self.camera.camera_x,
+                self.camera.camera_y,
+                self.touch_down,
+                self.touch_pos,
+            )
 
         if self.is_finished():
             if self.finish_time is None:
@@ -165,7 +173,22 @@ class WorldBase:
         pass
 
     def handle_events(self, events):
-        pass
+        for event in events:
+            if event.type == pygame.FINGERDOWN:
+                self.touch_down = True
+                self.touch_pos = (
+                    event.x * self.game.base_width,
+                    event.y * self.game.base_height,
+                )
+
+            elif event.type == pygame.FINGERUP:
+                self.touch_down = False
+
+            elif event.type == pygame.FINGERMOTION:
+                self.touch_pos = (
+                    event.x * self.game.base_width,
+                    event.y * self.game.base_height,
+                )
 
     def draw_hud(self, screen):
         w = screen.get_width()  # ← всегда актуальный размер

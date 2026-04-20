@@ -90,7 +90,7 @@ class Cat:
             center=(self.cat_x, self.cat_y)
         )
 
-    def update(self, camera_x, camera_y):
+    def update(self, camera_x, camera_y, touch_down=False, touch_pos=(0, 0)):
         moved = False
         keys = pygame.key.get_pressed()
 
@@ -110,7 +110,7 @@ class Cat:
             self.on_ground = False
 
         # mouse X только
-        if not (keys[pygame.K_LEFT] or keys[pygame.K_RIGHT]):
+        if not touch_down and not (keys[pygame.K_LEFT] or keys[pygame.K_RIGHT]):
             mx, _ = pygame.mouse.get_pos()
             mx_world = mx + camera_x
             dx = mx_world - self.cat_x
@@ -120,8 +120,8 @@ class Cat:
                 moved = True
 
         # 2. Управление пальцем на Android
-        if pygame.mouse.get_pressed()[0]:
-            mx, my = pygame.mouse.get_pos()
+        if touch_down:
+            mx, my = touch_pos
 
             # Левая половина экрана — влево
             if mx < self.screen_width // 2:

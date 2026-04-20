@@ -215,6 +215,9 @@ class Game:
                 if e.type == pygame.QUIT:
                     running = False
 
+            # --- обработка событий ---
+            self.world.handle_events(events)
+            
             # --- обновления ---
             self.world.update()
 
@@ -264,8 +267,7 @@ class Game:
             if hasattr(self.world, "draw_overlay"):
                 self.world.draw_overlay(self.screen)
 
-            # --- обработка событий ---
-            self.world.handle_events(events)
+            
 
             pygame.display.flip()
             self.clock.tick(FPS)

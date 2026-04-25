@@ -54,8 +54,8 @@ class Cat:
         self.JUMP_POWER = -20
         self.on_ground = True
 
-        self.cat_speed = 8
-        self.cat_anim_speed = 0.15
+        self.cat_speed = 10
+        self.cat_anim_speed = 0.3
         self.mouse_speed = 0.02
 
     def load_cat(self, direction, world_num, level_num, person_name="cat"):
@@ -172,6 +172,16 @@ class Cat:
                 self.cat_index = 0
         else:
             self.cat_index = 0
+
+        screen_x = self.cat_x - camera_x
+        margin = self.screen_width * 0.1  # 10% экрана
+
+        # мягкое ограничение (не стопорит кота)
+        if screen_x < margin:
+            self.cat_x += (margin - screen_x) * 0.2
+
+        if screen_x > self.screen_width - margin:
+            self.cat_x -= (screen_x - (self.screen_width - margin)) * 0.2
 
     def draw(self, screen, camera_x, camera_y):
 

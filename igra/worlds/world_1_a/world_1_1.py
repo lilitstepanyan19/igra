@@ -20,7 +20,7 @@ class World_1_1(WorldBase):
         h = self.game.base_height
         scale = h / bg_img.get_height()
         w = int(bg_img.get_width() * scale)
-        self.bg = pygame.transform.smoothscale(bg_img, (w, h))
+        self.bg = pygame.transform.scale(bg_img, (w, h))
         self.bg_w = self.bg.get_width()
 
         self.letters = []
@@ -41,7 +41,9 @@ class World_1_1(WorldBase):
             y = random.randint(140, self.game.base_height - 60)
             vx = random.choice([-1, 1]) * LETTER_SPEED
             vy = random.choice([-1, 1]) * LETTER_SPEED
-            self.letters.append(Letter(self.target, x, y, vx, vy, letter_bg))
+            self.letters.append(Letter(self.target, x, y, vx, vy, letter_bg, self.game.font_good,
+                    self.game.font_bad,
+                    self.target,))
 
         while target_count < 2 and len(self.letters) < count:
             char = (
@@ -54,7 +56,9 @@ class World_1_1(WorldBase):
             y = random.randint(140, WORLD_HEIGHT - 60)
             vx = random.choice([-1, 1])
             vy = random.choice([-1, 1])
-            self.letters.append(Letter(char, x, y, vx, vy, letter_bg))
+            self.letters.append(Letter(char, x, y, vx, vy, letter_bg, self.game.font_good,
+                    self.game.font_bad,
+                    self.target,))
 
     def update(self):
         super().update()
@@ -91,17 +95,19 @@ class World_1_1(WorldBase):
     def draw(self, screen):
 
         # фон
-        for x in range(0, WORLD_WIDTH, self.bg_w):
-            screen.blit(self.bg, (x - self.camera.camera_x, 0))
+        start_x = int(self.camera.camera_x // self.bg_w)
+        end_x = start_x + 2
+
+        for i in range(start_x, end_x + 1):
+            x = i * self.bg_w
+            screen.blit(self.bg, (int(x - self.camera.camera_x), 0))
 
         self.cat.draw(screen, self.camera.camera_x, self.camera.camera_y)
 
         # буквы
         for letter in self.letters:
-            letter.draw(
-                screen,
-                self.game.font_good,
-                self.game.font_bad,
-                self.camera.camera_x,
-                self.target,
-            )
+            if -100 < letter.x - self.camera.camera_x < self.game.base_width + 100:
+                letter.draw(
+                    screen,
+                    self.camera.camera_x,
+                )

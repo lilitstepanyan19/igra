@@ -87,11 +87,13 @@ class World_1_2(WorldBase):
 
         if target_count == 0:
             letter_bg = random.choice(self.letter_bg_imgs)
-            x = random.randint(60, WORLD_WIDTH - 60)
-            y = random.randint(140, WORLD_HEIGHT - 60)
+            x = random.randint(60, self.game.base_width - 60)
+            y = random.randint(140, self.game.base_height - 60)
             vx = random.choice([-1, 1]) * LETTER_SPEED
             vy = random.choice([-1, 1]) * LETTER_SPEED
-            self.letters.append(Letter(self.target, x, y, vx, vy, letter_bg))
+            self.letters.append(Letter(self.target, x, y, vx, vy, letter_bg, self.game.font_good,
+                    self.game.font_bad,
+                    self.target,))
 
         while target_count < 2 and len(self.letters) < count:
             char = (
@@ -102,9 +104,11 @@ class World_1_2(WorldBase):
             letter_bg = random.choice(self.letter_bg_imgs)
             x = random.randint(60, WORLD_WIDTH - 60)
             y = random.randint(140, WORLD_HEIGHT - 60)
-            vx = random.choice([-1, 1]) * LETTER_SPEED
-            vy = random.choice([-1, 1]) * LETTER_SPEED
-            self.letters.append(Letter(char.lower(), x, y, vx, vy, letter_bg))
+            vx = random.choice([-1, 1])
+            vy = random.choice([-1, 1])
+            self.letters.append(Letter(char, x, y, vx, vy, letter_bg, self.game.font_good,
+                    self.game.font_bad,
+                    self.target,))
 
     def update(self):
         super().update()
@@ -140,35 +144,48 @@ class World_1_2(WorldBase):
 
     def draw(self, screen):
         # фон
-        for x in range(0, WORLD_WIDTH, self.bg_w):
-            screen.blit(self.bg, (x - self.camera.camera_x, 0))
+        start_x = int(self.camera.camera_x // self.bg_w)
+        end_x = start_x + 2
+
+        for i in range(start_x, end_x + 1):
+            x = i * self.bg_w
+            screen.blit(self.bg, (int(x - self.camera.camera_x), 0))
 
         # дождь сзади
         for drop in self.rain_back:
-            drop.draw(screen, self.camera.camera_x)
+            screen_x = drop.x - self.camera.camera_x
+
+            if -20 < screen_x < self.game.base_width + 20:
+                drop.draw(screen, self.camera.camera_x)
+
+        self.cat.draw(screen, self.camera.camera_x, self.camera.camera_y)
 
         # буквы
         for letter in self.letters:
-            x = letter.x - self.camera.camera_x
-            y = letter.y
+            if -100 < letter.x - self.camera.camera_x < self.game.base_width + 100:
+                x = letter.x - self.camera.camera_x
+                y = letter.y
 
-            # фон под буквой
-            if letter.bg_img:
-                rect = letter.bg_img.get_rect(center=(x, y))
-                screen.blit(letter.bg_img, rect)
+                # фон под буквой
+                if letter.bg_img:
+                    rect = letter.bg_img.get_rect(center=(x, y))
+                    screen.blit(letter.bg_img, rect)
 
-            # другие цвета ТОЛЬКО для этого мира
-            if letter.char == self.target:
-                color = self.good_target_color 
-                font = self.game.font_good
-            else:
-                color = self.bad_target_color  # тёмно-синий
-                font = self.game.font_bad
+                # другие цвета ТОЛЬКО для этого мира
+                if letter.char == self.target:
+                    color = self.good_target_color 
+                    font = self.game.font_good
+                else:
+                    color = self.bad_target_color  # тёмно-синий
+                    font = self.game.font_bad
 
-            text = font.render(letter.char, True, color)
-            text_rect = text.get_rect(center=(x, y))
-            screen.blit(text, text_rect)
+                text = font.render(letter.char, True, color)
+                text_rect = text.get_rect(center=(x, y))
+                screen.blit(text, text_rect)
 
         # дождь спереди
         for drop in self.rain_front:
-            drop.draw(screen, self.camera.camera_x)
+            screen_x = drop.x - self.camera.camera_x
+
+            if -20 < screen_x < self.game.base_width + 20:
+                drop.draw(screen, self.camera.camera_x)

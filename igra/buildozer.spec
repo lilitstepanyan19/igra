@@ -47,7 +47,7 @@ requirements = python3==3.10.12,pygame==2.1.2,hostpython3==3.10.12,sdl2,sdl2_ima
 #presplash.filename = %(source.dir)s/data/presplash.png
 
 # (str) Icon of the application
-#icon.filename = %(source.dir)s/data/icon.png
+icon.filename = images/icon.png
 
 # (list) Supported orientations
 # Valid options are: landscape, portrait, portrait-reverse or landscape-reverse
@@ -101,7 +101,7 @@ fullscreen = 1
 #android.features = android.hardware.usb.host
 
 # (int) Target Android API, should be as high as possible.
-android.api = 31
+android.api = 35
 
 # (int) Minimum API your APK / AAB will support.
 android.minapi = 21
@@ -305,7 +305,7 @@ android.allow_backup = True
 # android.no-byte-compile-python = False
 
 # (str) The format used to package the app for release mode (aab or apk or aar).
-# android.release_artifact = aab
+android.release_artifact = apk
 
 # (str) The format used to package the app for debug mode (apk or aar).
 android.debug_artifact = apk

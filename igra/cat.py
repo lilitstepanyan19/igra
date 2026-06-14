@@ -55,7 +55,7 @@ class Cat:
         self.on_ground = True
 
         self.cat_speed = 10
-        self.cat_anim_speed = 0.3
+        self.cat_anim_speed = 0.5
         self.mouse_speed = 0.02
 
     def load_cat(self, direction, world_num, level_num, person_name="cat"):

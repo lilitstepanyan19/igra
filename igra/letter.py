@@ -7,13 +7,22 @@ LETTER_MAX_SPEED = 2.0
 
 class Letter:
 
-    def __init__(self, char, x, y, vx, vy, bg_img=None):
+    def __init__(self, char, x, y, vx, vy, bg_img=None, font_good=None, font_bad=None, target=None ):
         self.char = char  # символ буквы
         self.x = x
         self.y = y
         self.vx = vx
         self.vy = vy
         self.bg_img = bg_img
+
+        # выбираем цвет: зелёный для цели, красный для остальных
+        self.font = font_good if self.char == target else font_bad
+        self.color = (0, 180, 0) if self.char == target else (180, 0, 0)
+
+        self.text_surf = self.font.render(self.char, True, self.color)
+        self.draw_rect = self.text_surf.get_rect()
+
+        self.collision_rect = self.text_surf.get_rect(center=(x, y))
 
     def update(self, world_width, world_height):
         # движение буквы
@@ -25,28 +34,21 @@ class Letter:
             self.vx *= -1
         if self.y < 120 or self.y > world_height - 30:
             self.vy *= -1
+        # обновляем прямоугольник для столкновения
+        self.collision_rect.center = (self.x, self.y)   
 
-    def draw(self, screen, font_good, font_bad, camera_x, target):
+    def draw(self, screen, camera_x):
         if self.bg_img:
             rect = self.bg_img.get_rect(center=(self.x - camera_x, self.y))
             screen.blit(self.bg_img, rect)
 
-        # выбираем цвет: зелёный для цели, красный для остальных
-        font = font_good if self.char == target else font_bad
-        color = (0, 180, 0) if self.char == target else (180, 0, 0)
-
         # рендерим букву
-        text_surf = font.render(self.char, True, color)
-        text_rect = text_surf.get_rect(center=(self.x - camera_x, self.y))
-        screen.blit(text_surf, text_rect)
+        self.draw_rect.center = (self.x - camera_x, self.y)
+        screen.blit(self.text_surf, self.draw_rect)
 
         # --- рамка вокруг буквы ---
         # pygame.draw.rect(screen, (0, 255, 0), text_rect, 2)  # зелёная рамка
 
     def check_collision(self, cat_rect):
         # прямоугольник буквы для столкновения
-        temp_font = pygame.font.Font(None, 48)  # временный, просто для расчёта rect
-        text_rect = temp_font.render(self.char, True, (0, 0, 0)).get_rect(
-            center=(self.x, self.y)
-        )
-        return cat_rect.colliderect(text_rect)
+        return cat_rect.colliderect(self.collision_rect)

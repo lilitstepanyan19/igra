@@ -103,7 +103,12 @@ class Game:
             cont_text_rect = cont_surf.get_rect(center=cont_rect.center)
             self.screen.blit(cont_surf, cont_text_rect)
             buttons.append(("continue", cont_rect))
-
+            fps = self.font_hud.render(
+                f"FPS: {int(self.clock.get_fps())}",
+                True,
+                (0, 0, 0)
+            )
+            self.screen.blit(fps, (20, 20))
             # Новая игра
             new_text = "Նոր խաղ"
             new_surf = self.font_hud.render(new_text, True, (0, 0, 0))
@@ -255,13 +260,24 @@ class Game:
             self.world.draw(self.virtual_surface)
 
             # 2. Масштабируем мир
-            scaled = pygame.transform.smoothscale(
+            scaled = pygame.transform.scale(
                 self.virtual_surface, (self.screen_width, self.screen_height)
             )
             self.screen.blit(scaled, (0, 0))
 
             # 3. Рисуем HUD ПОВЕРХ (без scale)
             self.world.draw_hud(self.screen)
+            fps_text = self.font_hud.render(
+                f"FPS: {int(self.clock.get_fps())}",
+                True,
+                (255, 0, 0)
+            )
+
+            self.screen.blit(
+                fps_text,
+                (self.screen_width - fps_text.get_width() - 20,
+                 self.screen_height - fps_text.get_height() - 20)
+            )
 
             # 4. OVERLAY (LettersScreen или любые экраны)
             if hasattr(self.world, "draw_overlay"):

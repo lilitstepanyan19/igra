@@ -57,8 +57,8 @@ class Game:
         self.font_small = pygame.font.Font(file_path('fonts/GHEAGpalatBld.otf'), int(30 * font_scale))
 
         # -- Sounds ---
-        self.game_over_sound = pygame.mixer.Sound(file_path("sounds/game_over.wav"))
-        self.you_win_sound = pygame.mixer.Sound(file_path("sounds/you_win.wav"))
+        self.game_over_sound = pygame.mixer.Sound(file_path("sounds/game_over.ogg"))
+        self.you_win_sound = pygame.mixer.Sound(file_path("sounds/you_win.ogg"))
 
         self.world = None
 

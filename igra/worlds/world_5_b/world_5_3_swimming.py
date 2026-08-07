@@ -46,7 +46,7 @@ class World_5_3(WorldBase):
 
         if os.path.exists(sun_folder):
             for name in sorted(os.listdir(sun_folder)):
-                if name.endswith(".png"):
+                if name.endswith(".webp"):
                     img = pygame.image.load(os.path.join(sun_folder, name)).convert_alpha()
                     self.sun_imgs.append(img)
 

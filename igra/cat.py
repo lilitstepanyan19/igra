@@ -65,7 +65,7 @@ class Cat:
             folder = f"images/world_1/world_1_1/person"
 
         for name in sorted(os.listdir(folder)):
-            if name.endswith(f"_{direction}.png") and name.startswith(
+            if name.endswith(f"_{direction}.webp") and name.startswith(
                 f"{person_name}_"
             ):
                 path = os.path.join(folder, name)

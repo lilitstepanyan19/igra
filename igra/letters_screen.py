@@ -25,7 +25,7 @@ class LettersScreen:
         folder = f"images/world_{self.world_num}/letters_screen"
         self.side_img = None
         if os.path.exists(folder):
-            files = [f for f in os.listdir(folder) if f.lower().endswith(".png")]
+            files = [f for f in os.listdir(folder) if f.lower().endswith(".webp")]
             if files:
                 path = os.path.join(folder, files[0])
                 self.side_img = pygame.image.load(file_path(path)).convert_alpha()

@@ -51,7 +51,7 @@ class World_1_2(WorldBase):
         self.load_letter_bgs(self.world_num, self.level_num)
 
         # ===== ДОЖДЬ =====
-        drop_img = pygame.image.load("images/world_1/world_1_2/rain/rain_1.png").convert_alpha()
+        drop_img = pygame.image.load("images/world_1/world_1_2/rain/rain_1.webp").convert_alpha()
         drop_img = pygame.transform.scale(drop_img, (4, 60))  # ширина/высота капли
 
         # задний слой

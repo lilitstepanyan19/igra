@@ -16,7 +16,7 @@ source.dir = .
 source.include_exts = py,png,jpg,ogg,wav,ttf,otf,json
 
 # (list) List of inclusions using pattern matching
-#source.include_patterns = assets/*,images/*.png
+#source.include_patterns = assets/*,images/*.webp
 
 # (list) Source files to exclude (let empty to not exclude anything)
 source.exclude_exts = psd,mp4,zip,rar,log,tmp
@@ -37,17 +37,17 @@ version = 0.1
 
 # (list) Application requirements
 # comma separated e.g. requirements = sqlite3,kivy
-requirements = python3==3.10.12,pygame==2.1.2,hostpython3==3.10.12,sdl2,sdl2_image,sdl2_mixer,sdl2_ttf
+requirements = python3==3.10.12,pygame==2.1.2,hostpython3==3.10.12,sdl2,sdl2_image,sdl2_mixer,sdl2_ttf,pillow
 
 # (str) Custom source folders for requirements
 # Sets custom source for any requirements with recipes
 # requirements.source.kivy = ../../kivy
 
 # (str) Presplash of the application
-#presplash.filename = %(source.dir)s/data/presplash.png
+#presplash.filename = %(source.dir)s/data/presplash.webp
 
 # (str) Icon of the application
-icon.filename = images/icon.png
+icon.filename = images/icon.webp
 
 # (list) Supported orientations
 # Valid options are: landscape, portrait, portrait-reverse or landscape-reverse
@@ -90,8 +90,8 @@ fullscreen = 1
 #android.presplash_lottie = "path/to/lottie/file.json"
 
 # (str) Adaptive icon of the application (used if Android API level is 26+ at runtime)
-#icon.adaptive_foreground.filename = %(source.dir)s/data/icon_fg.png
-#icon.adaptive_background.filename = %(source.dir)s/data/icon_bg.png
+#icon.adaptive_foreground.filename = %(source.dir)s/data/icon_fg.webp
+#icon.adaptive_background.filename = %(source.dir)s/data/icon_bg.webp
 
 # (list) Permissions
 # (See https://python-for-android.readthedocs.io/en/latest/buildoptions/#build-options-1 for all the supported syntaxes and properties)
@@ -192,7 +192,7 @@ android.ndk_api = 21
 # The option may be used in three ways, the value may contain one or zero ':'
 # Some examples:
 # 1) A file to add to resources, legal resource names contain ['a-z','0-9','_']
-# android.add_resources = my_icons/all-inclusive.png:drawable/all_inclusive.png
+# android.add_resources = my_icons/all-inclusive.webp:drawable/all_inclusive.webp
 # 2) A directory, here  'legal_icons' must contain resources of one kind
 # android.add_resources = legal_icons:drawable
 # 3) A directory, here 'legal_resources' must contain one or more directories, 
@@ -233,7 +233,7 @@ android.ndk_api = 21
 #android.ouya.category = GAME
 
 # (str) Filename of OUYA Console icon. It must be a 732x412 png image.
-#android.ouya.icon.filename = %(source.dir)s/data/ouya_icon.png
+#android.ouya.icon.filename = %(source.dir)s/data/ouya_icon.webp
 
 # (str) XML file to include as an intent filters in <activity> tag
 #android.manifest.intent_filters =
@@ -422,13 +422,13 @@ warn_on_root = 1
 #    Instead of doing:
 #
 #[app]
-#source.exclude_patterns = license,data/audio/*.wav,data/images/original/*
+#source.exclude_patterns = license,data/audio/*.ogg,data/images/original/*
 #
 #    This can be translated into:
 #
 #[app:source.exclude_patterns]
 #license
-#data/audio/*.wav
+#data/audio/*.ogg
 #data/images/original/*
 #
 

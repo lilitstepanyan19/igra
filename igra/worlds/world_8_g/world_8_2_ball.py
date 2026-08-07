@@ -90,7 +90,7 @@ class World_8_3(WorldBase):
         self.water_level = 280
 
         self.drop_img = pygame.transform.scale(
-                pygame.image.load("images/world_8/world_8_3/ball/ball_1.png").convert_alpha(), (70, 70)
+                pygame.image.load("images/world_8/world_8_3/ball/ball_1.webp").convert_alpha(), (70, 70)
             )
 
         # задний слой

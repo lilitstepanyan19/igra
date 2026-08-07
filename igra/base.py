@@ -46,12 +46,12 @@ class WorldBase:
 
         self.person_name = "cat"
 
-        self.eat_sound = pygame.mixer.Sound(file_path("sounds/eat.wav"))
-        self.eat_bad_sound = pygame.mixer.Sound(file_path("sounds/eat.wav"))
-        self.level_up_sound = pygame.mixer.Sound(file_path("sounds/level_up.wav"))
+        self.eat_sound = pygame.mixer.Sound(file_path("sounds/eat.ogg"))
+        self.eat_bad_sound = pygame.mixer.Sound(file_path("sounds/eat.ogg"))
+        self.level_up_sound = pygame.mixer.Sound(file_path("sounds/level_up.ogg"))
 
         self.lives = LIVES_COUNT if lives is None else lives
-        self.heart_img = pygame.image.load(file_path("images/heart.png")).convert_alpha()
+        self.heart_img = pygame.image.load(file_path("images/heart.webp")).convert_alpha()
         self.heart_img = pygame.transform.scale(self.heart_img, (32, 32))
 
         self.finish_time = None        # момент завершения уровня
@@ -98,10 +98,10 @@ class WorldBase:
         self.camera = Camera(WIDTH, HEIGHT, WORLD_WIDTH, WORLD_HEIGHT)
 
     def load_bg(self, bg_img_num=1):
-        path = f"images/world_{self.world_num}/world_{self.world_num}_{self.level_num}/bg_img/bg_{bg_img_num}.png"
+        path = f"images/world_{self.world_num}/world_{self.world_num}_{self.level_num}/bg_img/bg_{bg_img_num}.webp"
 
         if not os.path.exists(path):
-            path = "images/world_1/world_1_1/bg_img/bg_1.png"
+            path = "images/world_1/world_1_1/bg_img/bg_1.webp"
 
         return pygame.image.load(file_path(path)).convert_alpha()
 
@@ -112,7 +112,7 @@ class WorldBase:
 
         if os.path.exists(folder):
             for name in sorted(os.listdir(folder)):
-                if name.startswith("letter_bg") and name.endswith(".png"):
+                if name.startswith("letter_bg") and name.endswith(".webp"):
                     path = os.path.join(folder, name)
                     img = pygame.image.load(file_path(path)).convert_alpha()
                     imgs.append(img)
@@ -122,7 +122,7 @@ class WorldBase:
             fallback = "images/world_1/world_1_1/letter_bg/"
             if os.path.exists(fallback):
                 for name in sorted(os.listdir(fallback)):
-                    if name.startswith("letter_bg") and name.endswith(".png"):
+                    if name.startswith("letter_bg") and name.endswith(".webp"):
                         path = os.path.join(fallback, name)
                         img = pygame.image.load(file_path(path)).convert_alpha()
                         imgs.append(img)
@@ -138,6 +138,16 @@ class WorldBase:
         imgs = new_imgs
         self.letter_bg_imgs = imgs
         return imgs
+
+    def is_on_screen(self, obj_rect):
+        """Проверяет, попадает ли объект в видимую область экрана."""
+        screen_rect = pygame.Rect(
+            self.camera.camera_x, 
+            self.camera.camera_y, 
+            self.screen_width, 
+            self.screen_height
+        )
+        return screen_rect.colliderect(obj_rect)
 
     def update(self):
         if self.camera:

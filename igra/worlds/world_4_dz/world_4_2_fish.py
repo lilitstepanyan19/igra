@@ -15,9 +15,9 @@ class FishDrop:
         self.water_level = water_level
 
         self.dir = random.choice([-1, 1])  # -1 ← , 1 →
-        self.wave_offset = random.uniform(0, 6.28)
-        self.wave_speed = random.uniform(0.02, 0.05)
-        self.wave_amplitude = random.randint(25, 35)
+        self.ogge_offset = random.uniform(0, 6.28)
+        self.ogge_speed = random.uniform(0.02, 0.05)
+        self.ogge_amplitude = random.randint(25, 35)
 
         # разворот картинки
         if self.dir == -1:
@@ -28,8 +28,8 @@ class FishDrop:
         self.x += self.speed * self.dir
 
         # волнообразное плавание
-        self.wave_offset += self.wave_speed
-        self.y = self.base_y + math.sin(self.wave_offset) * self.wave_amplitude
+        self.ogge_offset += self.ogge_speed
+        self.y = self.base_y + math.sin(self.ogge_offset) * self.ogge_amplitude
         self.y = max(self.water_level, self.y)
         self.y = min(self.y, world_height - 100)
 
@@ -76,16 +76,16 @@ class World_4_2(WorldBase):
 
         self.drop_img = [
             pygame.transform.scale(
-                pygame.image.load("images/world_4/world_4_2/fish/seahorse.png").convert_alpha(), (70, 40)
+                pygame.image.load("images/world_4/world_4_2/fish/seahorse.webp").convert_alpha(), (70, 40)
             ),
             pygame.transform.scale(
-                pygame.image.load("images/world_4/world_4_2/fish/fish_blue.png").convert_alpha(), (110, 55)
+                pygame.image.load("images/world_4/world_4_2/fish/fish_blue.webp").convert_alpha(), (110, 55)
             ),
             pygame.transform.scale(
-                pygame.image.load("images/world_4/world_4_2/fish/fish_red.png").convert_alpha(), (100, 75)
+                pygame.image.load("images/world_4/world_4_2/fish/fish_red.webp").convert_alpha(), (100, 75)
             ),
             pygame.transform.scale(
-                pygame.image.load("images/world_4/world_4_2/fish/medusa.png").convert_alpha(), (60, 80)
+                pygame.image.load("images/world_4/world_4_2/fish/medusa.webp").convert_alpha(), (60, 80)
             ),]
 
         # задний слой

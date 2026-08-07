@@ -85,12 +85,13 @@ class World_1_1(WorldBase):
             return
 
         # постепенное появление букв
-        if now - self.last_spawn_time > self.spawn_delay:
-            self.spawn(self.letter_count)
-            self.last_spawn_time = now
-
-        # добиваем буквы до нужного количества
-        self.spawn(self.letter_count)
+        if now - self.start_time >= self.spawn_delay_start:
+            if now - self.last_spawn_time > self.spawn_delay:
+                self.spawn(self.letter_count)
+                self.last_spawn_time = now
+        
+                # добиваем буквы до нужного количества
+                self.spawn(self.letter_count)
 
     def draw(self, screen):
 

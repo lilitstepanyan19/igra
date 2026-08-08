@@ -10,7 +10,7 @@ from cat import Cat
 from camera import Camera
 from save import save_progress
 from letters_screen import LettersScreen
-
+from levels_config import LEVELS_MAP
 
 WORLD_WIDTH = 15000
 WORLD_HEIGHT = 600
@@ -270,88 +270,46 @@ class WorldBase:
         return self.score >= self.need
 
     def next_world(self):
+        next_level_num = self.level_num + 1
+        next_world_num = self.world_num + 1
 
-        # --- текущий файл и папка ---
-        try:
-            class_file = inspect.getfile(self.__class__)
-        except:
-            class_file = __file__
-        folder = os.path.dirname(class_file)
-        file_name = os.path.basename(class_file)
+        # 1. Проверяем следующий уровень в текущем мире
+        target_key = (self.world_num, next_level_num)
 
-        # world_1_2_rain.py -> 1_2_rain
-        name = file_name.replace("world_", "").replace(".py", "")
-        parts = name.split("_")
-
-        world_num = int(parts[0])
-        level_num = int(parts[1]) + 1
-
-        package = self.__class__.__module__.rsplit(".", 1)[0]
-
-        # ========== 1. ищем следующий уровень в той же папке ==========
-        if not os.path.exists(folder):
-            print("Folder not found:", folder)
-            return None
-
-        for f in os.listdir(folder):
-            if f.startswith(f"world_{world_num}_{level_num}"):
-                module_name = f"{package}.{f[:-3]}"
-                try:
-                    module = importlib.import_module(module_name)
-                except Exception as e:
-                    print("Import error:", e)
-                    return None
-
-                save_progress(f"World_{world_num}_{level_num}")
-                class_name = f"World_{world_num}_{level_num}"
-
-                if not hasattr(module, class_name):
-                    print("Class not found:", class_name)
-                    return None
-
+        if target_key in LEVELS_MAP:
+            mod_path, class_name = LEVELS_MAP[target_key]
+            try:
+                module = importlib.import_module(mod_path)
                 WorldClass = getattr(module, class_name)
-
+                save_progress(f"World_{self.world_num}_{next_level_num}")
                 return WorldClass(self.game, lives=self.lives)
+            except Exception as e:
+                print(f"Ошибка загрузки уровня {target_key}: {e}")
+                return None
 
-        # ========== 2. ищем следующий мир ==========
-        worlds_root = os.path.dirname(folder)
+        # 2. Если уровни текущего мира закончились — загружаем следующий мир
+        next_world_key = (next_world_num, 1)
+        if next_world_key in LEVELS_MAP:
+            mod_path, class_name = LEVELS_MAP[next_world_key]
+            try:
+                module = importlib.import_module(mod_path)
+                first_world_class = getattr(module, class_name)
 
-        next_world_num = world_num + 1
-        next_world_folder = None
+                if next_world_num - 1 < len(ARMENIAN_LETTERS):
+                    target = ARMENIAN_LETTERS[next_world_num - 1]
+                    target_lower = target.lower()
+                    letters = [target, target, target_lower, target_lower]
 
-        for d in os.listdir(worlds_root):
-            if d.startswith(f"world_{next_world_num}_"):
-                next_world_folder = d
-                break
+                    def go_next_world():
+                        save_progress(f"World_{next_world_num}_1")
+                        return first_world_class(self.game, lives=self.lives)
 
-        if not next_world_folder:
-            return None
+                    return LettersScreen(
+                        self.game, letters, next_world_num, go_next_world
+                    )
+            except Exception as e:
+                print(f"Ошибка загрузки мира {next_world_num}: {e}")
+                return None
 
-        next_folder_path = os.path.join(worlds_root, next_world_folder)
-
-        first_world_class = None
-        first_world_module = None
-
-        for f in os.listdir(next_folder_path):
-            if f.startswith(f"world_{next_world_num}_1"):
-                module_name = f"worlds.{next_world_folder}.{f[:-3]}"
-                first_world_module = importlib.import_module(module_name)
-                first_world_class = getattr(first_world_module, f"World_{next_world_num}_1")
-                break
-
-        if not first_world_class:
-            return None
-
-        target = ARMENIAN_LETTERS[next_world_num - 1]
-        target_lower = target.lower()
-
-        letters = [target, target, target_lower, target_lower]
-
-        # --- функция перехода в первый уровень следующего мира ---
-        def go_next_world():
-            save_progress(f"World_{next_world_num}_1")
-            return first_world_class(self.game, lives=self.lives)
-
-        return LettersScreen(self.game, letters, next_world_num, go_next_world)
-
+        print("Игра полностью пройдена или уровень не найден!")
         return None

@@ -1,3 +1,4 @@
+import os
 import pygame
 import random
 from base import WorldBase, WORLD_WIDTH, WORLD_HEIGHT, NEED, SCORE, LETTER_COUNT, ARMENIAN_LETTERS
@@ -51,8 +52,23 @@ class World_1_2(WorldBase):
         self.load_letter_bgs(self.world_num, self.level_num)
 
         # ===== ДОЖДЬ =====
-        drop_img = pygame.image.load("images/world_1/world_1_2/rain/rain_1.webp").convert_alpha()
+        CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
+        BASE_DIR = os.path.abspath(os.path.join(CURRENT_DIR, "..", ".."))
+        rain_path = os.path.join(BASE_DIR, "images", "world_1", "world_1_2", "rain", "rain_1.webp")
+        drop_img = pygame.image.load(rain_path).convert_alpha()
         drop_img = pygame.transform.scale(drop_img, (4, 60))  # ширина/высота капли
+
+        # Определяем, запущена ли игра на Android
+        try:
+            from android import python_act
+
+            IS_ANDROID = True
+        except ImportError:
+            IS_ANDROID = False
+
+        # Задаем количество капель в зависимости от платформы
+        count_back = 250 if IS_ANDROID else 1500
+        count_front = 150 if IS_ANDROID else 1000
 
         # задний слой
         self.rain_back = [
@@ -62,7 +78,7 @@ class World_1_2(WorldBase):
                 random.uniform(2, 3),
                 drop_img,
             )
-            for _ in range(1500)
+            for _ in range(count_back)
         ]
 
         # передний слой
@@ -73,7 +89,7 @@ class World_1_2(WorldBase):
                 random.uniform(4, 5),
                 drop_img,
             )
-            for _ in range(1000)
+            for _ in range(count_front)
         ]
 
         # ===== ВРЕМЯ ДЛЯ ПОЯВЛЕНИЯ БУКВ =====

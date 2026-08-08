@@ -13,7 +13,7 @@ package.domain = org.example
 source.dir = .
 
 # (list) Source files to include (let empty to include all the files)
-source.include_exts = py,png,jpg,ogg,wav,ttf,otf,json
+source.include_exts = py,png,jpg,ogg,wav,ttf,otf,json,webp
 
 # (list) List of inclusions using pattern matching
 #source.include_patterns = assets/*,images/*.webp

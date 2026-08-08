@@ -36,7 +36,17 @@ class World_1_3(WorldBase):
 
         # ===== СОЛНЦЕ =====
         self.sun_imgs = []
-        sun_folder = f"images/world_{self.world_num}/world_{self.world_num}_{self.level_num}/sun"
+        CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
+        BASE_DIR = os.path.abspath(os.path.join(CURRENT_DIR, "..", ".."))
+
+        # 2. Собираем полный путь к папке sun
+        sun_folder = os.path.join(
+            BASE_DIR,
+            "images",
+            f"world_{self.world_num}",
+            f"world_{self.world_num}_{self.level_num}",
+            "sun",
+        )
 
         if os.path.exists(sun_folder):
             for name in sorted(os.listdir(sun_folder)):

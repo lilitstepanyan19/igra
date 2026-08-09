@@ -51,8 +51,11 @@ class WorldBase:
         self.level_up_sound = pygame.mixer.Sound(file_path("sounds/level_up.ogg"))
 
         self.lives = LIVES_COUNT if lives is None else lives
-        self.heart_img = pygame.image.load(file_path("images/heart.webp")).convert_alpha()
-        self.heart_img = pygame.transform.scale(self.heart_img, (32, 32))
+        
+        # Оптимизация сердца
+        self.heart_base_img = pygame.image.load(file_path("images/heart.webp")).convert_alpha()
+        self.cached_heart_img = None
+        self.cached_heart_lives = -1
 
         self.finish_time = None        # момент завершения уровня
         self.next_level_class = None   # класс следующего уровня
@@ -63,6 +66,9 @@ class WorldBase:
         self.last_hit_time = 0
 
         self.letter_bg_imgs = []
+
+        # Кэш для текстовых поверхностей HUD
+        self._hud_cache = {}
 
         # --- определяем мир и уровень по имени класса ---
         name = self.__class__.__name__  # например World_1_1
@@ -83,7 +89,7 @@ class WorldBase:
             self.world_num,
             self.level_num,
             self.person_name,
-            cat_scale=getattr(self, "cat_scale", 1.0),  # ✅ ВАЖНО
+            cat_scale=getattr(self, "cat_scale", 1.0),
             cat_width=getattr(self, "cat_width", 120),
             cat_height=getattr(self, "cat_height", 120),
             cat_y_offset=getattr(self, "cat_y_offset", 15),
@@ -103,7 +109,8 @@ class WorldBase:
         if not os.path.exists(path):
             path = "images/world_1/world_1_1/bg_img/bg_1.webp"
 
-        return pygame.image.load(file_path(path)).convert_alpha()
+        # ВАЖНО: используем convert() для фонов без прозрачности
+        return pygame.image.load(file_path(path)).convert()
 
     def load_letter_bgs(self, world_num, level_num, folder_name="letter_bg"):
         folder = f"images/world_{world_num}/world_{world_num}_{level_num}/{folder_name}/"
@@ -117,7 +124,7 @@ class WorldBase:
                     img = pygame.image.load(file_path(path)).convert_alpha()
                     imgs.append(img)
 
-        # 👉 если в мире нет своих фонов — берём из world_1_1
+        # если в мире нет своих фонов — берём из world_1_1
         if not imgs:
             fallback = "images/world_1/world_1_1/letter_bg/"
             if os.path.exists(fallback):
@@ -127,12 +134,13 @@ class WorldBase:
                         img = pygame.image.load(file_path(path)).convert_alpha()
                         imgs.append(img)
 
-        # ===== обработка фонов букв (общие параметры) =====
+        # ===== обработка фонов букв =====
         new_imgs = []
         bg_size = int(self.game.screen_height * 0.089)
         for img in imgs:
-            img = pygame.transform.smoothscale(img, (bg_size, bg_size)).convert_alpha()  # размер
-            img.set_alpha(220)  # прозрачность
+            # Используем быструю масштабируемость scale вместо smoothscale
+            img = pygame.transform.scale(img, (bg_size, bg_size)).convert_alpha()
+            img.set_alpha(220)
             new_imgs.append(img)
 
         imgs = new_imgs
@@ -200,17 +208,23 @@ class WorldBase:
                     event.y * self.game.base_height,
                 )
 
+    def _get_cached_text(self, font, text, color):
+        """Вспомогательный метод кэширования текста для предотвращения лагов."""
+        key = (text, color)
+        if key not in self._hud_cache:
+            self._hud_cache[key] = font.render(text, True, color)
+        return self._hud_cache[key]
+
     def draw_hud(self, screen):
-        w = screen.get_width()  # ← всегда актуальный размер
+        w = screen.get_width()
         h = screen.get_height()
-        bg_size = int(h * 0.089)
 
         take_text = "Բռնիր "
-        count_text = f" {self.need - self.score} հատ"
+        count_text = f" {max(0, self.need - self.score)} հատ"
 
-        # Рендерим части
-        take_surf = self.game.font_hud.render(take_text, True, (0, 0, 0))
-        count_surf = self.game.font_hud.render(count_text, True, (0, 0, 0))
+        # Рендерим кэшированный текст
+        take_surf = self._get_cached_text(self.game.font_hud, take_text, (0, 0, 0))
+        count_surf = self._get_cached_text(self.game.font_hud, count_text, (0, 0, 0))
 
         # Позиции
         x = int(h * 0.022)
@@ -219,51 +233,53 @@ class WorldBase:
         screen.blit(take_surf, (x, y))
         x += take_surf.get_width()
 
-        if self.letter_bg_imgs:
-            bg_img = self.letter_bg_imgs[0]  # или random.choice(self.letter_bg_imgs)
+        if self.letter_bg_imgs and self.target:
+            bg_img = self.letter_bg_imgs[0]
             bg_rect = bg_img.get_rect(topleft=(x, y - int(h * 0.01)))
             screen.blit(bg_img, bg_rect)
 
             # текст поверх фона
-            color = getattr(self, "good_target_color", (0, 180, 0))  # если нет — зелёный
-            target_surf = self.game.font_good.render(self.target, True, color)
+            color = getattr(self, "good_target_color", (0, 180, 0))
+            target_surf = self._get_cached_text(self.game.font_good, self.target, color)
             target_rect = target_surf.get_rect(center=bg_rect.center)
             screen.blit(target_surf, target_rect)
             x += bg_rect.width
-        else:
-            # если фона нет — обычная буква
-            target_surf = self.game.font_good.render(self.target, True, (0, 220, 0))
+        elif self.target:
+            target_surf = self._get_cached_text(self.game.font_good, self.target, (0, 220, 0))
             screen.blit(target_surf, (x, y - int(h * 0.005)))
             x += target_surf.get_width()
 
         screen.blit(count_surf, (x, y))
 
-        # --- Большое сердце и количество жизней ---
-        max_heart_size = int(h * 0.1)
-        min_heart_size = int(h * 0.045)
+        # --- КЭШИРОВАННОЕ СЕРДЦЕ С ЖИЗНЯМИ ---
+        if self.cached_heart_lives != self.lives:
+            max_heart_size = int(h * 0.1)
+            min_heart_size = int(h * 0.045)
+            if self.lives > 0:
+                heart_size = min_heart_size + (max_heart_size - min_heart_size) * (self.lives / LIVES_COUNT)
+            else:
+                heart_size = min_heart_size
 
-        # размер сердца пропорционален количеству жизней
-        if self.lives > 0:
-            heart_size = min_heart_size + (max_heart_size - min_heart_size) * (self.lives / LIVES_COUNT)
-        else:
-            heart_size = min_heart_size
+            self.cached_heart_img = pygame.transform.scale(
+                self.heart_base_img, (int(heart_size), int(heart_size))
+            )
+            self.cached_heart_lives = self.lives
 
-        heart_img_scaled = pygame.transform.scale(self.heart_img, (int(heart_size), int(heart_size)))
-        # координаты справа сверху
-        heart_x = w - int(heart_size) - int(h * 0.022)
+        heart_size = self.cached_heart_img.get_width()
+        heart_x = w - heart_size - int(h * 0.022)
         heart_y = int(h * 0.022)
-        screen.blit(heart_img_scaled, (heart_x, heart_y))
+        screen.blit(self.cached_heart_img, (heart_x, heart_y))
 
-        # показываем число жизней рядом
+        # Число жизней
         lives_text = f"x {self.lives}"
-        lives_surf = self.game.font_hud.render(lives_text, True, (0, 0, 0))
+        lives_surf = self._get_cached_text(self.game.font_hud, lives_text, (0, 0, 0))
         lives_x = heart_x + heart_size // 2 - lives_surf.get_width() // 2
         lives_y = heart_y + heart_size // 2 - lives_surf.get_height() // 2
         screen.blit(lives_surf, (lives_x, lives_y))
 
         # --- WORLD / LEVEL и счет ---
         header_text = f"Աշխարհ {self.world_num}, Փուլ- {self.level_num}   {self.score}/{self.need}"
-        header_surf = self.game.font_hud.render(header_text, True, (0, 0, 0))
+        header_surf = self._get_cached_text(self.game.font_hud, header_text, (0, 0, 0))
         screen.blit(header_surf, (int(h * 0.022), int(h * 0.022)))
 
     def is_finished(self):
@@ -273,7 +289,6 @@ class WorldBase:
         next_level_num = self.level_num + 1
         next_world_num = self.world_num + 1
 
-        # 1. Проверяем следующий уровень в текущем мире
         target_key = (self.world_num, next_level_num)
 
         if target_key in LEVELS_MAP:
@@ -287,7 +302,6 @@ class WorldBase:
                 print(f"Ошибка загрузки уровня {target_key}: {e}")
                 return None
 
-        # 2. Если уровни текущего мира закончились — загружаем следующий мир
         next_world_key = (next_world_num, 1)
         if next_world_key in LEVELS_MAP:
             mod_path, class_name = LEVELS_MAP[next_world_key]

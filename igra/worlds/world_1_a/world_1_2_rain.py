@@ -1,9 +1,8 @@
-import os
 import pygame
 import random
 from base import WorldBase, WORLD_WIDTH, WORLD_HEIGHT, NEED, SCORE, LETTER_COUNT, ARMENIAN_LETTERS
 from letter import Letter, LETTER_SPEED
-
+from paths import file_path  # импортируем функцию file_path
 
 class RainDrop:
     def __init__(self, x, y, speed, img):
@@ -52,9 +51,7 @@ class World_1_2(WorldBase):
         self.load_letter_bgs(self.world_num, self.level_num)
 
         # ===== ДОЖДЬ =====
-        CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
-        BASE_DIR = os.path.abspath(os.path.join(CURRENT_DIR, "..", ".."))
-        rain_path = os.path.join(BASE_DIR, "images", "world_1", "world_1_2", "rain", "rain_1.webp")
+        rain_path = file_path("images/world_1/world_1_2/rain/rain_1.webp")
         drop_img = pygame.image.load(rain_path).convert_alpha()
         drop_img = pygame.transform.scale(drop_img, (4, 60))  # ширина/высота капли
 

@@ -9,7 +9,6 @@ from paths import file_path
 
 from letters_screen import LettersScreen
 from worlds.world_1_a.world_1_1 import World_1_1  # стартовый мир
-# from worlds.world_6_k.world_6_3 import World_6_3
 
 
 class Game:
@@ -17,48 +16,69 @@ class Game:
         pygame.init()
         try:
             pygame.mixer.init()
-        except:
+        except Exception:
             print("Mixer not available")
 
-        self.is_android = 'ANDROID_ARGUMENT' in os.environ or 'P4A_BOOTSTRAP' in os.environ
+        self.is_android = (
+            "ANDROID_ARGUMENT" in os.environ or "P4A_BOOTSTRAP" in os.environ
+        )
 
-        # Базовый размер (как будто игра на 900×600)
+        # Базовый размер игрового мира
         self.base_width = WIDTH
         self.base_height = HEIGHT
 
         if self.is_android:
             self.screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
         else:
-            self.screen = pygame.display.set_mode((self.base_width, self.base_height), pygame.RESIZABLE)
+            self.screen = pygame.display.set_mode(
+                (self.base_width, self.base_height), pygame.RESIZABLE
+            )
 
         # Реальный размер экрана
         self.screen_width = self.screen.get_width()
         self.screen_height = self.screen.get_height()
 
-        # Масштаб (берём минимальный, чтобы не растягивать)
+        # Масштаб (берём минимальный, чтобы не искажать пропорции)
         self.scale = min(
             self.screen_width / self.base_width, self.screen_height / self.base_height
         )
         self.center_x = self.screen_width // 2
         self.center_y = self.screen_height // 2
 
+        # Виртуальная поверхность для отрисовки мира
         self.virtual_surface = pygame.Surface((self.base_width, self.base_height))
 
         pygame.display.set_caption("Տառերն ու կենդանիները")
         self.clock = pygame.time.Clock()
 
         font_scale = self.scale * (1.3 if self.is_android else 1.0)
-        self.font_good = pygame.font.Font(file_path("fonts/GHEAGpalatBld.otf"), int(48 * font_scale))
-        self.font_bad = pygame.font.Font(file_path("fonts/GHEAGpalatBld.otf"), int(36 * font_scale))
-        self.font_hud = pygame.font.Font(file_path("fonts/GHEAGpalatBld.otf"), int(24 * font_scale))
+        self.font_good = pygame.font.Font(
+            file_path("fonts/GHEAGpalatBld.otf"), int(48 * font_scale)
+        )
+        self.font_bad = pygame.font.Font(
+            file_path("fonts/GHEAGpalatBld.otf"), int(36 * font_scale)
+        )
+        self.font_hud = pygame.font.Font(
+            file_path("fonts/GHEAGpalatBld.otf"), int(24 * font_scale)
+        )
 
-        self.font_big = pygame.font.Font(file_path('fonts/GHEAGpalatBld.otf'), int(150 * font_scale))
-        self.font_big_handwriting = pygame.font.Font(file_path('fonts/Vrdznagir.otf'), int(150 * font_scale))
-        self.font_small = pygame.font.Font(file_path('fonts/GHEAGpalatBld.otf'), int(30 * font_scale))
+        self.font_big = pygame.font.Font(
+            file_path("fonts/GHEAGpalatBld.otf"), int(150 * font_scale)
+        )
+        self.font_big_handwriting = pygame.font.Font(
+            file_path("fonts/Vrdznagir.otf"), int(150 * font_scale)
+        )
+        self.font_small = pygame.font.Font(
+            file_path("fonts/GHEAGpalatBld.otf"), int(30 * font_scale)
+        )
 
         # -- Sounds ---
-        self.game_over_sound = pygame.mixer.Sound(file_path("sounds/game_over.ogg"))
-        self.you_win_sound = pygame.mixer.Sound(file_path("sounds/you_win.ogg"))
+        try:
+            self.game_over_sound = pygame.mixer.Sound(file_path("sounds/game_over.ogg"))
+            self.you_win_sound = pygame.mixer.Sound(file_path("sounds/you_win.ogg"))
+        except Exception:
+            self.game_over_sound = None
+            self.you_win_sound = None
 
         self.world = None
 
@@ -67,7 +87,10 @@ class Game:
         running = True
         while running:
             self.screen_width, self.screen_height = self.screen.get_size()
-            self.scale = min(self.screen_width / self.base_width, self.screen_height / self.base_height)
+            self.scale = min(
+                self.screen_width / self.base_width,
+                self.screen_height / self.base_height,
+            )
             self.center_x = self.screen_width // 2
             self.center_y = self.screen_height // 2
             self.screen.fill((200, 230, 255))  # светлый фон
@@ -79,8 +102,6 @@ class Game:
             self.screen.blit(title, (title_x, title_y))
 
             # --- Кнопки ---
-            mouse_x, mouse_y = pygame.mouse.get_pos()
-            # Кнопки — крупные, с отступом
             btn_width = int(self.screen_width * 0.22 * self.scale)
             btn_height = int(self.screen_height * 0.08 * self.scale)
             btn_spacing = int(btn_height * 1.5)
@@ -92,37 +113,51 @@ class Game:
             # Продолжить
             cont_text = "Շարունակել"
             cont_surf = self.font_hud.render(cont_text, True, (0, 0, 0))
-            cont_rect = pygame.Rect(
-                btn_start_x,
-                btn_start_y,
-                btn_width,
-                btn_height
+            cont_rect = pygame.Rect(btn_start_x, btn_start_y, btn_width, btn_height)
+            pygame.draw.rect(
+                self.screen,
+                (100, 255, 100),
+                cont_rect,
+                border_radius=int(20 * self.scale),
             )
-            pygame.draw.rect(self.screen, (100, 255, 100), cont_rect, border_radius=int(20 * self.scale))
-            pygame.draw.rect(self.screen, (0, 120, 0), cont_rect, int(6 * self.scale), border_radius=int(20 * self.scale))
+            pygame.draw.rect(
+                self.screen,
+                (0, 120, 0),
+                cont_rect,
+                int(6 * self.scale),
+                border_radius=int(20 * self.scale),
+            )
             cont_text_rect = cont_surf.get_rect(center=cont_rect.center)
             self.screen.blit(cont_surf, cont_text_rect)
             buttons.append(("continue", cont_rect))
-            fps = self.font_hud.render(
-                f"FPS: {int(self.clock.get_fps())}",
-                True,
-                (0, 0, 0)
-            )
-            self.screen.blit(fps, (20, 20))
+
             # Новая игра
             new_text = "Նոր խաղ"
             new_surf = self.font_hud.render(new_text, True, (0, 0, 0))
             new_rect = pygame.Rect(
-                btn_start_x,
-                btn_start_y + btn_spacing,
-                btn_width,
-                btn_height
+                btn_start_x, btn_start_y + btn_spacing, btn_width, btn_height
             )
-            pygame.draw.rect(self.screen, (255, 100, 100), new_rect, border_radius=int(20 * self.scale))
-            pygame.draw.rect(self.screen, (180, 0, 0), new_rect, int(6 * self.scale), border_radius=int(20 * self.scale))
+            pygame.draw.rect(
+                self.screen,
+                (255, 100, 100),
+                new_rect,
+                border_radius=int(20 * self.scale),
+            )
+            pygame.draw.rect(
+                self.screen,
+                (180, 0, 0),
+                new_rect,
+                int(6 * self.scale),
+                border_radius=int(20 * self.scale),
+            )
             new_text_rect = new_surf.get_rect(center=new_rect.center)
             self.screen.blit(new_surf, new_text_rect)
             buttons.append(("new", new_rect))
+
+            fps = self.font_hud.render(
+                f"FPS: {int(self.clock.get_fps())}", True, (0, 0, 0)
+            )
+            self.screen.blit(fps, (20, 20))
 
             pygame.display.flip()
             self.clock.tick(FPS)
@@ -140,28 +175,38 @@ class Game:
                             elif action == "new":
                                 if os.path.exists(SAVE_FILE):
                                     os.remove(SAVE_FILE)
-                                first_letters = [ARMENIAN_LETTERS[0], ARMENIAN_LETTERS[0],
-                                                 ARMENIAN_LETTERS[0].lower(), ARMENIAN_LETTERS[0].lower()]
-                                self.world = LettersScreen(self, first_letters, 1, lambda: World_1_1(self))
+                                first_letters = [
+                                    ARMENIAN_LETTERS[0],
+                                    ARMENIAN_LETTERS[0],
+                                    ARMENIAN_LETTERS[0].lower(),
+                                    ARMENIAN_LETTERS[0].lower(),
+                                ]
+                                self.world = LettersScreen(
+                                    self, first_letters, 1, lambda: World_1_1(self)
+                                )
                                 self.world.start()
                                 running = False
 
     def load_last_world(self):
-        world_name = load_progress()  # например "World_1_2"
+        world_name = load_progress()
 
         if not world_name:
             world_num = 1
+
             def start_first_world():
                 world = World_1_1(self)
                 world.start()
                 return world
+
             first_letters = [
                 ARMENIAN_LETTERS[0],
                 ARMENIAN_LETTERS[0],
                 ARMENIAN_LETTERS[0].lower(),
                 ARMENIAN_LETTERS[0].lower(),
             ]
-            self.world = LettersScreen(self, first_letters, world_num, start_first_world)
+            self.world = LettersScreen(
+                self, first_letters, world_num, start_first_world
+            )
             self.world.start()
             return
 
@@ -172,7 +217,6 @@ class Game:
 
             worlds_root = "worlds"
 
-            # --- ищем папку мира: world_1_a, world_2_s и т.д. ---
             world_folder = None
             for d in os.listdir(worlds_root):
                 if d.startswith(f"world_{world_num}_"):
@@ -182,7 +226,6 @@ class Game:
             if not world_folder:
                 raise Exception("world folder not found")
 
-            # --- ищем файл уровня ---
             level_file = None
             for f in os.listdir(os.path.join(worlds_root, world_folder)):
                 if f.startswith(f"world_{world_num}_{level_num}") and f.endswith(".py"):
@@ -200,18 +243,20 @@ class Game:
             self.world = WorldClass(self)
             self.world.start()
 
-        except Exception as e:
+        except Exception:
             self.world = LettersScreen(self, "ABC", None)
             self.world.start()
 
     def run(self):
-        self.start_screen()  # сначала экран выбора
+        self.start_screen()
 
         running = True
         while running:
-            # Пересчитываем размер и масштаб каждый кадр (важно для RESIZABLE на ПК)
             self.screen_width, self.screen_height = self.screen.get_size()
-            self.scale = min(self.screen_width / self.base_width, self.screen_height / self.base_height)
+            self.scale = min(
+                self.screen_width / self.base_width,
+                self.screen_height / self.base_height,
+            )
             self.center_x = self.screen_width // 2
             self.center_y = self.screen_height // 2
 
@@ -222,68 +267,81 @@ class Game:
 
             # --- обработка событий ---
             self.world.handle_events(events)
-            
+
             # --- обновления ---
             self.world.update()
 
             # --- проверка завершения уровня ---
             if hasattr(self.world, "game_completed") and self.world.game_completed:
-                self.you_win_sound.play()
+                if self.you_win_sound:
+                    self.you_win_sound.play()
 
                 self.screen.fill((0, 0, 0))
-                win = self.font_good.render("Դու արդեն գիտես բոլոր տառեը", True, (255, 255, 255))
+                win = self.font_good.render(
+                    "Դու արդեն գիտես բոլոր տառեը", True, (255, 255, 255)
+                )
                 self.screen.blit(
                     win,
-                    (self.screen_width // 2 - win.get_width() // 2, self.screen_height // 2)
+                    (
+                        self.screen_width // 2 - win.get_width() // 2,
+                        self.screen_height // 2,
+                    ),
                 )
 
                 pygame.display.flip()
-                pygame.time.wait(4000)
+                pygame.time.delay(3000)
                 running = False
                 continue
 
-            if self.world.lives <= 0:
-                self.game_over_sound.play()  # ← звук проигрыша
+            if hasattr(self.world, "lives") and self.world.lives <= 0:
+                if self.game_over_sound:
+                    self.game_over_sound.play()
                 self.screen.fill((0, 0, 0))
                 lose = self.font_good.render("Պարտվեցիր", True, (255, 0, 0))
-                self.screen.blit(lose, (self.screen_width // 2 - 120, self.screen_height // 2))
+                self.screen.blit(
+                    lose,
+                    (
+                        self.screen_width // 2 - lose.get_width() // 2,
+                        self.screen_height // 2,
+                    ),
+                )
                 pygame.display.flip()
-                pygame.time.wait(3000)
+                pygame.time.delay(3000)
                 running = False
                 continue
 
             # --- ОЧИСТКА ЭКРАНА ---
             self.screen.fill((255, 255, 255))
 
-            # 1. Рисуем мир
-            self.virtual_surface.fill((255, 255, 255))
-            self.world.draw(self.virtual_surface)
+            if hasattr(self.world, "draw_overlay"):
+                # Если у мира есть свой overlay (например, LettersScreen), рисуем его прямо на экран
+                self.world.draw_overlay(self.screen)
+            else:
+                # 1. Рисуем мир на виртуальной поверхности (900x600)
+                self.virtual_surface.fill((255, 255, 255))
+                self.world.draw(self.virtual_surface)
 
-            # 2. Масштабируем мир
-            scaled = pygame.transform.scale(
-                self.virtual_surface, (self.screen_width, self.screen_height)
-            )
-            self.screen.blit(scaled, (0, 0))
+                # 2. Быстро масштабируем виртуальную поверхность во весь текущий экран
+                scaled = pygame.transform.scale(
+                    self.virtual_surface, (self.screen_width, self.screen_height)
+                )
+                self.screen.blit(scaled, (0, 0))
 
-            # 3. Рисуем HUD ПОВЕРХ (без scale)
-            self.world.draw_hud(self.screen)
+                # 3. Рисуем HUD ПОВЕРХ масштабированного мира
+                self.world.draw_hud(self.screen)
+
+            # --- Отображение FPS ---
             fps_text = self.font_hud.render(
-                f"FPS: {int(self.clock.get_fps())}",
-                True,
-                (255, 0, 0)
+                f"FPS: {int(self.clock.get_fps())}", True, (255, 0, 0)
             )
 
             self.screen.blit(
                 fps_text,
-                (self.screen_width - fps_text.get_width() - 20,
-                 self.screen_height - fps_text.get_height() - 20)
+                (
+                    self.screen_width - fps_text.get_width() - 20,
+                    self.screen_height - fps_text.get_height() - 20,
+                ),
             )
-
-            # 4. OVERLAY (LettersScreen или любые экраны)
-            if hasattr(self.world, "draw_overlay"):
-                self.world.draw_overlay(self.screen)
-
-            
 
             pygame.display.flip()
             self.clock.tick(FPS)

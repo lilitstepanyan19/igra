@@ -26,18 +26,22 @@ class Letter:
         self.vy = vy
         self.bg_img = bg_img
 
-        # Выбираем шрифт и цвет
+        # Выбираем шрифт и цвет с защитой от None
         font = font_good if self.char == target else font_bad
+        if font is None:
+            font = pygame.font.SysFont("arial", 32)
+
         color = (0, 180, 0) if self.char == target else (180, 0, 0)
 
-        # Рендерим текст с ускоренным форматом пикселей
-        text_surf = font.render(self.char, True, color).convert_alpha()
+        # Рендерим текст
+        try:
+            text_surf = font.render(self.char, True, color).convert_alpha()
+        except Exception:
+            text_surf = font.render(self.char, True, color)
 
-        # Если есть фон — объединяем фон и текст в ОДНУ поверхность (один surface)
+        # Объединяем текст и фон
         if bg_img:
-            # Клонируем фоновую картинку
             self.image = bg_img.copy()
-            # Накладываем текст строго по центру фоновой картинки
             t_rect = text_surf.get_rect(
                 center=(self.image.get_width() // 2, self.image.get_height() // 2)
             )
@@ -45,7 +49,11 @@ class Letter:
         else:
             self.image = text_surf
 
-        # Кэшируем Rect (создаём прямоугольник один раз при инициализации)
+        # Кэшируем параметры
+        self.width = self.image.get_width()
+        self.height = self.image.get_height()
+
+        # Создаем Rect строго по центру координат
         self.rect = self.image.get_rect(center=(int(self.x), int(self.y)))
 
     def update(self, world_width, world_height):
@@ -59,15 +67,25 @@ class Letter:
         if self.y < 120 or self.y > world_height - 30:
             self.vy *= -1
 
-        # Обновляем координаты центра сгенерированного прямоугольника
+        # Точно обновляем координаты прямоугольника для коллизий
         self.rect.centerx = int(self.x)
         self.rect.centery = int(self.y)
 
-    def draw(self, screen, camera_x):
-        # Делаем ВСЕГО один blit вместо двух
-        # Быстро вычисляем положение на экране без создания новых Rect
-        screen.blit(self.image, (self.rect.x - int(camera_x), self.rect.y))
+    def draw(self, screen, font_good=None, font_bad=None, camera_x=0, target=None):
+        """
+        Возвращены все необязательные параметры (font_good, font_bad, target),
+        так как их передает код уровня при вызове draw!
+        """
+        # Если camera_x не передана или передана как позиционный аргумент
+        if isinstance(font_good, (int, float)) and camera_x == 0:
+            camera_x = font_good
+
+        screen_x = self.rect.x - int(camera_x)
+
+        # Отрисовка на экране
+        if -self.width <= screen_x <= screen.get_width():
+            screen.blit(self.image, (screen_x, self.rect.y))
 
     def check_collision(self, cat_rect):
-        # Используем уже готовый self.rect
+        # Точная проверка столкновения с котом
         return cat_rect.colliderect(self.rect)
